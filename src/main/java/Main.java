@@ -18,11 +18,8 @@ public class Main {
     private static LoginWindow loginWindow;
 
     public static void main(String[] args) throws IOException {
-
         LoginWindow loginWindow = new LoginWindow();
-
         initializeFirebase();
-
     }
 
     public static void initializeFirebase() throws IOException {
@@ -35,6 +32,4 @@ public class Main {
 
         FirebaseApp.initializeApp(options);
     }
-
-
 }

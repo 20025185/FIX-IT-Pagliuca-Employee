@@ -42,4 +42,12 @@ public class Employee {
     public void setUID(String t_uid){
         uid = t_uid;
     }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "email='" + email + '\'' +
+                ", tokenID='" + tokenID + '\'' +
+                '}';
+    }
 }

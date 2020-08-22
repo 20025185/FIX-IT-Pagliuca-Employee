@@ -1,4 +1,5 @@
 import com.google.firebase.database.*;
+import org.apache.commons.logging.Log;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class LoginWindow extends JFrame implements ActionListener, KeyListener {
+public class LoginWindow extends JFrame implements ActionListener {
     private Container container = getContentPane();
     private JTextField userTextField = new JTextField();
     private JPasswordField passwordField = new JPasswordField();
@@ -81,6 +82,8 @@ public class LoginWindow extends JFrame implements ActionListener, KeyListener {
                 exception.printStackTrace();
             }
 
+            System.out.println("Login button clicked, result : \n" + employee.toString());
+
             if (!employee.getUID().isEmpty()) {
                 dbr = FirebaseDatabase.getInstance().getReference("employee");
                 dbr.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -99,25 +102,9 @@ public class LoginWindow extends JFrame implements ActionListener, KeyListener {
                 if (isEmployee) {
                     dashBoard = new DashBoard(employee);
                     this.dispose();
-
                 }
 
             }
         }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
     }
 }
