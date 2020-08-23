@@ -1,3 +1,5 @@
+package utils;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -18,7 +20,7 @@ public class FirebaseAuthAPI {
     private String firebaseKey;
     private static FirebaseAuthAPI instance = null;
 
-    protected FirebaseAuthAPI() {
+    public FirebaseAuthAPI() {
         firebaseKey = "AIzaSyAvOgNrXpFdMpNhi7KgyXq0Bav7WejwRk0";
     }
 

@@ -1,11 +1,12 @@
+package GUI;
+
+import utils.Employee;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-public class DashBoard extends JFrame implements ActionListener, KeyListener {
+public class DashBoard extends JFrame {
     private Container container = getContentPane();
 
     //  Labels
@@ -16,9 +17,9 @@ public class DashBoard extends JFrame implements ActionListener, KeyListener {
     //  Menu Bar
     private static JMenuBar jMenuBar;
     private static JMenu fileMenu, reportMenu;
-    private static JMenuItem profileItem, exitItem;
+    private static JMenuItem profileItem, exitItem, handlingReports;
 
-    //  Employee logged
+    //  utils.Employee logged
     private static Employee employee;
 
     DashBoard(Employee t_employee) {
@@ -35,9 +36,8 @@ public class DashBoard extends JFrame implements ActionListener, KeyListener {
         setLayoutManager();
         setLocationAndSize();
         addComponents();
-        addActionEvent();
+        //addActionEvent();
     }
-
 
     public void setLayoutManager() {
         container.setLayout(null);
@@ -52,12 +52,21 @@ public class DashBoard extends JFrame implements ActionListener, KeyListener {
     private void initMenu() {
         jMenuBar = new JMenuBar();
         fileMenu = new JMenu("File");
+        reportMenu = new JMenu("Segnalazioni");
+        handlingReports = new JMenuItem(new AbstractAction("Gestione segnalazioni") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
         profileItem = new JMenuItem(new AbstractAction("Profile") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Clicked on profile");
             }
         });
+
         exitItem = new JMenuItem(new AbstractAction("Esci") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,10 +77,11 @@ public class DashBoard extends JFrame implements ActionListener, KeyListener {
 
         this.setJMenuBar(jMenuBar);
         jMenuBar.add(fileMenu);
+        jMenuBar.add(reportMenu);
         fileMenu.add(profileItem);
         fileMenu.add(exitItem);
+        reportMenu.add(handlingReports);
     }
-
 
     public void addComponents() {
         container.add(uidLabel);
@@ -86,29 +96,5 @@ public class DashBoard extends JFrame implements ActionListener, KeyListener {
         this.setVisible(true);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-
-    private void addActionEvent() {
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
     }
 }

@@ -1,3 +1,5 @@
+package utils;
+
 public class Employee {
     private static String uid;
     private String email;
@@ -45,7 +47,7 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "Employee{" +
+        return "utils.Employee{" +
                 "email='" + email + '\'' +
                 ", tokenID='" + tokenID + '\'' +
                 '}';
