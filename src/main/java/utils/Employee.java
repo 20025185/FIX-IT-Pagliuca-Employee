@@ -5,7 +5,7 @@ public class Employee {
     private String email;
     private String tokenID;
 
-    Employee(){
+    public Employee(){
 
     }
 

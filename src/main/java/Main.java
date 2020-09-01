@@ -1,3 +1,4 @@
+import GUI.DashBoard;
 import GUI.LoginWindow;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -5,6 +6,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import utils.Employee;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,6 +23,13 @@ public class Main {
     public static void main(String[] args) throws IOException {
         LoginWindow loginWindow = new LoginWindow();
         initializeFirebase();
+
+        //  testing
+        Employee employee  = new Employee();
+        employee.setEmail("asdfdas@test.it");
+        employee.setUID("kljdsfnaskjfnaslfàò231");
+        employee.setTokenID("klsdnflkasmi30239uraowifm#ç@|!");
+        DashBoard dashBoard = new DashBoard(employee);
     }
 
     public static void initializeFirebase() throws IOException {
