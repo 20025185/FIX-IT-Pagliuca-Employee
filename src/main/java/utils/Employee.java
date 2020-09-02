@@ -2,15 +2,59 @@ package utils;
 
 public class Employee {
     private static String uid;
+    private static String tokenID;
     private String email;
-    private String tokenID;
+    private String fiscalCode;
+    private String fullname;
+    private String surname;
 
     public Employee(){
 
     }
 
+    public Employee(String email, String fiscalCode, String fullname, String surname) {
+        this.email = email;
+        this.fiscalCode = fiscalCode;
+        this.fullname = fullname;
+        this.surname = surname;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "email='" + email + '\'' +
+                ", fiscalCode='" + fiscalCode + '\'' +
+                ", fullname='" + fullname + '\'' +
+                ", surname='" + surname + '\'' +
+                '}';
+    }
+
     Employee(String t_uid){
         uid = t_uid;
+    }
+
+    public String getFiscalCode() {
+        return fiscalCode;
+    }
+
+    public void setFiscalCode(String fiscalCode) {
+        this.fiscalCode = fiscalCode;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public static String getUid() {
@@ -45,11 +89,4 @@ public class Employee {
         uid = t_uid;
     }
 
-    @Override
-    public String toString() {
-        return "utils.Employee{" +
-                "email='" + email + '\'' +
-                ", tokenID='" + tokenID + '\'' +
-                '}';
-    }
 }

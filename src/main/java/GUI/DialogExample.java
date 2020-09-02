@@ -16,7 +16,7 @@ public class DialogExample {
     private static JLabel statusLabel = new JLabel("Status");
 
     private static String[] priorities = {"0", "1", "2"};
-    private static String[] possibleStatus = {"Open", "Pending", "Closed"};
+    private static String[] possibleStatus = {"Aperta", "Pending", "Chiusa"};
 
     private static JComboBox priority = new JComboBox(priorities);
     private static JTextField object = new JTextField(10);

@@ -25,10 +25,7 @@ public class Main {
         initializeFirebase();
 
         //  testing
-        Employee employee  = new Employee();
-        employee.setEmail("asdfdas@test.it");
-        employee.setUID("kljdsfnaskjfnaslfàò231");
-        employee.setTokenID("klsdnflkasmi30239uraowifm#ç@|!");
+        Employee employee = new Employee("asdfdas@test.it", "PGLMNKL", "Manuel", "Pagliuca");
         DashBoard dashBoard = new DashBoard(employee);
     }
 

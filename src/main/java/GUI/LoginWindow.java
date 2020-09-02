@@ -116,7 +116,6 @@ public class LoginWindow extends JFrame implements ActionListener {
             exception.printStackTrace();
         }
 
-        System.out.println("Login button clicked, result : \n" + employee.toString());
 
         if (!employee.getUID().isEmpty()) {
             dbr = FirebaseDatabase.getInstance().getReference("employee");
