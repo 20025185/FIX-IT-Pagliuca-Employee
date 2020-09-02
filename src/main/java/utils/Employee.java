@@ -8,7 +8,7 @@ public class Employee {
     private String fullname;
     private String surname;
 
-    public Employee(){
+    public Employee() {
 
     }
 
@@ -29,7 +29,7 @@ public class Employee {
                 '}';
     }
 
-    Employee(String t_uid){
+    Employee(String t_uid) {
         uid = t_uid;
     }
 
@@ -81,11 +81,11 @@ public class Employee {
         this.tokenID = tokenID;
     }
 
-    public String getUID(){
+    public String getUID() {
         return uid;
     }
 
-    public void setUID(String t_uid){
+    public void setUID(String t_uid) {
         uid = t_uid;
     }
 

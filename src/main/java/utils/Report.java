@@ -39,6 +39,20 @@ public class Report {
         this.id = id;
     }
 
+    public Report(){
+        this.id = "";
+        this.uid = "";
+        this.object = "";
+        this.description = "";
+        this.date = "";
+        this.time = "";
+        this.type = "";
+        this.position = "";
+        this.priority = "";
+        this.status = "";
+        this.social = "";
+    }
+
     public Report(String id, String uid, String object, String description, String date, String time, String type, String position, String priority, String status, String social) {
         this.id = id;
         this.uid = uid;

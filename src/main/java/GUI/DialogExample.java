@@ -40,6 +40,7 @@ public class DialogExample {
                 DatabaseReference databaseReference = firebaseDatabase.getReference("reports").child(report.getId());
 
                 databaseReference.setValueAsync(report);
+                d.dispose();
             }
         });
 
