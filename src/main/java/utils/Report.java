@@ -1,7 +1,6 @@
 package utils;
 
 public class Report {
-
     private String id;
     private String uid;
     private String object;

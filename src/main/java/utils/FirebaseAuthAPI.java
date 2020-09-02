@@ -12,10 +12,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class FirebaseAuthAPI {
-    private static final String BASE_URL = "https://identitytoolkit.googleapis.com/v1/accounts:";
-    private static final String OPERATION_AUTH = "signInWithPassword";
-    private static final String OPERATION_REFRESH_TOKEN = "token";
-    private static final String OPERATION_ACCOUNT_INFO = "lookup";
+    private final String BASE_URL = "https://identitytoolkit.googleapis.com/v1/accounts:";
+    private final String OPERATION_AUTH = "signInWithPassword";
+    private final String OPERATION_REFRESH_TOKEN = "token";
+    private final String OPERATION_ACCOUNT_INFO = "lookup";
 
     private String firebaseKey;
     private static FirebaseAuthAPI instance = null;

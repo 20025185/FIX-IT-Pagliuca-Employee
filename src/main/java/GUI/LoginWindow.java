@@ -12,20 +12,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class LoginWindow extends JFrame implements ActionListener {
-    private Container container = getContentPane();
-    private JLabel emailLabel = new JLabel("e-mail : ");
-    private JLabel pswLabel = new JLabel("Password : ");
-    private JTextField emailField = new JTextField();
-    private JPasswordField passwordField = new JPasswordField();
-    private JButton loginButton = new JButton("LOGIN");
+    private final Container container = getContentPane();
+    private final JLabel emailLabel = new JLabel("e-mail : ");
+    private final JLabel pswLabel = new JLabel("Password : ");
+    private final JTextField emailField = new JTextField();
+    private final JPasswordField passwordField = new JPasswordField();
+    private final JButton loginButton = new JButton("LOGIN");
 
-    private static FirebaseAuthAPI firebaseAuthAPI;
-    private static DatabaseReference dbr;
-    private String uid;
     private boolean isEmployee = false;
-    private static Employee employee;
-
-    private static DashBoard dashBoard;
+    private  Employee employee;
 
     public LoginWindow() {
         initialize();
@@ -94,7 +89,7 @@ public class LoginWindow extends JFrame implements ActionListener {
     }
 
     private String getPsw() {
-        return passwordField.getText();
+        return String.valueOf(passwordField.getPassword());
     }
 
     @Override
@@ -108,7 +103,7 @@ public class LoginWindow extends JFrame implements ActionListener {
         final String email = getEmail();
         final String psw = getPsw();
 
-        firebaseAuthAPI = new FirebaseAuthAPI();
+        FirebaseAuthAPI firebaseAuthAPI = new FirebaseAuthAPI();
 
         try {
             employee = firebaseAuthAPI.auth(email, psw);
@@ -118,7 +113,7 @@ public class LoginWindow extends JFrame implements ActionListener {
 
 
         if (!employee.getUID().isEmpty()) {
-            dbr = FirebaseDatabase.getInstance().getReference("employee");
+            DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("employee");
             dbr.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -133,7 +128,7 @@ public class LoginWindow extends JFrame implements ActionListener {
             });
 
             if (isEmployee) {
-                dashBoard = new DashBoard(employee);
+                DashBoard dashBoard = new DashBoard(employee);
                 this.dispose();
             }
 

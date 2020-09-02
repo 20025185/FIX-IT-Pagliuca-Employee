@@ -8,30 +8,28 @@ import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.concurrent.Semaphore;
 
 public class ChatBidirectional extends JFrame {
     //  Elements
-    private JPanel chatPanel = new JPanel();
-    private JTextPane chatArea = new JTextPane();
-    private JTextField textToSend = new JTextField();
-    private JScrollPane scrollPane;
-    private JButton sendButton = new JButton("Invia");
+    private final JPanel chatPanel = new JPanel();
+    private final JTextPane chatArea = new JTextPane();
+    private final JTextField textToSend = new JTextField();
+    private final JButton sendButton = new JButton("Invia");
 
     //  Message Components
     private String fullname;
     private String surname;
-    private Report report;
-    private Employee employee;
-    private String chatString = "";
+    private final Report report;
+    private final Employee employee;
+    private final StringBuilder chatString = new StringBuilder();
+    //private String chatString = "";
     private int msgIndex = 0;
 
     //  Firebase
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference usersReference = firebaseDatabase.getReference("users");
     private DatabaseReference chatReference = firebaseDatabase.getReference("reports");
 
@@ -67,13 +65,7 @@ public class ChatBidirectional extends JFrame {
             }
         });
 
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendingText();
-            }
-
-        });
+        sendButton.addActionListener(e -> sendingText());
     }
 
     private void sendingText() {
@@ -105,7 +97,8 @@ public class ChatBidirectional extends JFrame {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot d : dataSnapshot.getChildren()) {
-                    chatString += d.getValue().toString() + "\n";
+                    chatString.append(d.getValue().toString()).append("\n");
+                    //chatString += d.getValue().toString() + "\n";
                 }
                 msgIndex = (int) dataSnapshot.getChildrenCount();
                 semaphore2.release();
@@ -163,7 +156,7 @@ public class ChatBidirectional extends JFrame {
         chatArea.setMinimumSize(new Dimension(300, 100));
         chatArea.setEditable(false);
         chatArea.setAlignmentX(Component.CENTER_ALIGNMENT);
-        chatArea.setText(chatString);
+        chatArea.setText(String.valueOf(chatString));
 
         textToSend.setMaximumSize(new Dimension(400, 1));
         textToSend.setSize(250, 1);
@@ -174,7 +167,9 @@ public class ChatBidirectional extends JFrame {
         SimpleAttributeSet simpleAttributeSet = new SimpleAttributeSet();
         StyleConstants.setForeground(simpleAttributeSet, Color.BLACK);
 
-        scrollPane = new JScrollPane(chatArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane scrollPane = new JScrollPane(chatArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setSize(new Dimension(300, 100));
 
         chatPanel.add(scrollPane, BorderLayout.CENTER);

@@ -1,8 +1,9 @@
 package utils;
 
 public class Employee {
-    private static String uid;
-    private static String tokenID;
+    //private static String uid;
+    private String uid;
+    private String tokenID;
     private String email;
     private String fiscalCode;
     private String fullname;
@@ -57,12 +58,12 @@ public class Employee {
         this.surname = surname;
     }
 
-    public static String getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public static void setUid(String uid) {
-        Employee.uid = uid;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getEmail() {
