@@ -23,7 +23,6 @@ public class DialogExample {
         JFrame f = new JFrame();
         JDialog d = new JDialog(f, "Dialog Example", true);
         d.setLayout(new FlowLayout());
-
         object.setText(report.getObject());
         JButton edit = new JButton("Modifica");
 

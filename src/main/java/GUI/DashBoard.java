@@ -16,7 +16,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class DashBoard extends JFrame implements KeyListener {
-
     //  Elements of JFrame
     private JLabel uidLabel;
     private JLabel emailLabel;
@@ -35,15 +34,22 @@ public class DashBoard extends JFrame implements KeyListener {
     private final JPanel profilePanel = new JPanel();
 
     //  Pending Report Panel
-    private final JPanel reportPanel = new JPanel();
+    private final JPanel pendingReportPanel = new JPanel();
     private final JLabel labelReportInfo = new JLabel();
-    private final JPanel rightPane = new JPanel();
-    private JSplitPane splitPane = new JSplitPane();
-    private final JButton handleReport = new JButton("Edit");
-    private final JButton openReport = new JButton("Apri Segnalazione");
+    private final JPanel pendingRightPane = new JPanel();
+    private JSplitPane pendingSplitPane = new JSplitPane();
+    private final JButton editBtn = new JButton("Edit");
+    private final JButton openStatusBtn = new JButton("Apri Segnalazione");
 
     //  Open reports Panel
     private final JPanel openReportPanel = new JPanel();
+    private JSplitPane openSplitPane = new JSplitPane();
+    private final JLabel openReportlabelInfo = new JLabel();
+    private final JPanel openRightPanel = new JPanel();
+    private final JRadioButton pendingRadioBtn = new JRadioButton("Pending");
+    private final JRadioButton closedRadioBtn = new JRadioButton("Chiusa");
+    private final ButtonGroup statusButtons = new ButtonGroup();
+    private final JButton submitStatusBtn = new JButton("Imposta");
 
     //  Closed reports Panel
     private final JPanel closedReportPanel = new JPanel();
@@ -54,6 +60,9 @@ public class DashBoard extends JFrame implements KeyListener {
     //  Thread
     private final Semaphore semaphore = new Semaphore(0);
 
+    //  Utils
+    private int cardShowed;
+
     //  External
     private final Vector<ChatBidirectional> chatInstances = new Vector<>();
     private final Employee employee;
@@ -62,36 +71,367 @@ public class DashBoard extends JFrame implements KeyListener {
 
     public DashBoard(Employee t_employee) {
         employee = t_employee;
+        requestFocus(true);
         addKeyListener(this);
 
-        //  Loading static stuff
+        Runnable r = this::retrieveReportsIDs;
+
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(r, 0, 100, TimeUnit.MILLISECONDS);
+
+        //  First call for initialise GUI, next will need refresh.
+        loadPendingReportsPanel();
         loadProfilePanel();
         loadStatsReportPanel();
         loadOpenReportsPanel();
         loadClosedReportPanel();
         handlePendingReportsButtons();
-
-        Runnable r = this::retrieveReportsIDs;
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.scheduleAtFixedRate(r, 0, 100, TimeUnit.MILLISECONDS);
-
         initMenu();
         initialize();
         setLayoutManager();
         setLocationAndSize();
     }
 
+    //  Thread function, for download data in to vectors
+    private void retrieveReportsIDs() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    switch (d.child("status").getValue().toString().split("_")[0]) {
+                        case "Pending":
+                            if (!pendingReportIDs.contains(d.getKey())) {
+                                pendingReportIDs.add(d.getKey());
+                            }
+                            break;
+                        case "Aperta":
+                            if (!openReportIDs.contains(d.getKey())) {
+                                openReportIDs.add(d.getKey());
+                            }
+                            break;
+                        case "Chiusa":
+                            if (!closedReportIDs.contains(d.getKey())) {
+                                closedReportIDs.add(d.getKey());
+                            }
+                            break;
+                    }
+                }
+
+                checkIntegrity(pendingReportIDs, "Pending", dataSnapshot);
+                checkIntegrity(openReportIDs, "Aperta", dataSnapshot);
+                checkIntegrity(closedReportIDs, "Chiusa", dataSnapshot);
+
+                semaphore.release();
+
+                if (chatInstances.isEmpty()) {
+                    requestFocus(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void checkIntegrity(Vector<String> vectorIDs, String status, DataSnapshot dataSnapshot) {
+        boolean isThere = false;
+
+        for (String str : vectorIDs) {
+            for (DataSnapshot d : dataSnapshot.getChildren()) {
+                if (d.child("status").getValue().toString().split("_")[0].equals(status)) {
+                    if (d.getKey().equals(str)) {
+                        isThere = true;
+                    }
+                }
+            }
+
+            if (!isThere) {
+                vectorIDs.remove(str);
+            }
+        }
+    }
+
+    //  Dynamic functions (depends from keyListeners and thread function)
+    private void loadPendingReportsPanel() {
+        JList<String> stringJList = new JList<>(pendingReportIDs);
+
+        stringJList.addListSelectionListener(e1 -> {
+            final DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("reports").child(stringJList.getSelectedValue());
+
+            dbr.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String priority = dataSnapshot.child("priority").getValue().toString();
+                    String object = dataSnapshot.child("object").getValue().toString();
+                    String date = dataSnapshot.child("date").getValue().toString();
+                    String time = dataSnapshot.child("time").getValue().toString();
+                    String uid = dataSnapshot.child("uid").getValue().toString();
+                    String type = dataSnapshot.child("type").getValue().toString();
+                    String description = dataSnapshot.child("description").getValue().toString();
+                    String position = dataSnapshot.child("position").getValue().toString();
+                    String status = dataSnapshot.child("status").getValue().toString();
+                    String social = dataSnapshot.child("social").getValue().toString();
+                    String id = stringJList.getSelectedValue();
+
+                    singlePendingReport = new Report(id, uid, object, description, date, time, type, position, priority, status, social);
+
+                    switch (priority) {
+                        case "0":
+                            stringJList.setSelectionBackground(Color.GREEN);
+                            break;
+                        case "1":
+                            stringJList.setSelectionBackground(Color.YELLOW);
+                            break;
+                        case "2":
+                            stringJList.setSelectionBackground(Color.RED);
+                            break;
+                        default:
+                            stringJList.setSelectionBackground(Color.GRAY);
+                            break;
+                    }
+
+                    labelReportInfo.setText("<html>" +
+                            "Oggetto : " + object + "<br><br>" +
+                            "Data : " + date + "<br><br>" +
+                            "Ora : " + time + "<br><br>" +
+                            "UID : " + uid + "<br><br>" +
+                            "Tipologia : " + type + "<br><br>" +
+                            "Descrizione : " + description + "<br><br>" +
+                            "Coordinate : " + position + "<br><br>" +
+                            "Priorità : " + priority + "<br><br>" +
+                            "Diffusione su social : " + social + "<br><br>" +
+                            "Status : Pending <br><br>" + "</html>");
+
+                    pendingRightPane.add(labelReportInfo);
+                    pendingRightPane.add(editBtn);
+                    pendingRightPane.add(openStatusBtn);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        });
+
+        pendingReportPanel.setPreferredSize(new Dimension(800, 600));
+
+        labelReportInfo.setHorizontalAlignment(SwingConstants.LEFT);
+        labelReportInfo.setVerticalAlignment(SwingConstants.TOP);
+
+        pendingRightPane.setLayout(new BoxLayout(pendingRightPane, BoxLayout.Y_AXIS));
+
+        JScrollPane jScrollPane = new JScrollPane(stringJList);
+
+        pendingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, jScrollPane, pendingRightPane);
+        pendingSplitPane.setDividerLocation(180);
+        pendingSplitPane.setOneTouchExpandable(true);
+        pendingSplitPane.setPreferredSize(new Dimension(750, 520));
+
+        pendingReportPanel.removeAll();
+        pendingReportPanel.add(pendingSplitPane);
+        pendingReportPanel.revalidate();
+        pendingReportPanel.repaint();
+    }
+
+    private void loadOpenReportsPanel() {
+        jListOpenReports = new JList<>(openReportIDs);
+        jListOpenReports.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //  Static
+        openReportTitle.setSize(20, 20);
+        openReportTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //  Dynamic
+        openReportPanel.remove(openSplitPane);
+        openReportPanel.remove(openRightPanel);
+        openReportPanel.remove(openReportlabelInfo);
+
+        jListOpenReports = new JList<>(openReportIDs);
+        jListOpenReports.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        jListOpenReports.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                final String reportId = jListOpenReports.getSelectedValue();
+
+                if (e.getClickCount() == 1) {
+                    Semaphore semaphore = new Semaphore(0);
+
+                    openReportlabelInfo.setText("");
+                    openRightPanel.remove(openReportlabelInfo);
+                    openRightPanel.remove(pendingRadioBtn);
+                    openRightPanel.remove(closedRadioBtn);
+                    openRightPanel.remove(submitStatusBtn);
+
+                    openRightPanel.revalidate();
+                    openRightPanel.repaint();
+
+                    databaseReference.child(reportId).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String priority = dataSnapshot.child("priority").getValue().toString();
+                            String object = dataSnapshot.child("object").getValue().toString();
+                            String date = dataSnapshot.child("date").getValue().toString();
+                            String time = dataSnapshot.child("time").getValue().toString();
+                            String uid = dataSnapshot.child("uid").getValue().toString();
+                            String type = dataSnapshot.child("type").getValue().toString();
+                            String description = dataSnapshot.child("description").getValue().toString();
+                            String position = dataSnapshot.child("position").getValue().toString();
+                            String status = dataSnapshot.child("status").getValue().toString().split("_")[0];
+                            String social = dataSnapshot.child("social").getValue().toString();
+
+                            singleOpenReport = new Report(reportId, uid, object, description, date, time, type, position, priority, "Aperta_" + reportId, social);
+
+                            openReportlabelInfo.setText("<html>" +
+                                    "Oggetto : " + object + "<br><br>" +
+                                    "Data : " + date + "<br><br>" +
+                                    "Ora : " + time + "<br><br>" +
+                                    "UID : " + uid + "<br><br>" +
+                                    "Tipologia : " + type + "<br><br>" +
+                                    "Descrizione : " + description + "<br><br>" +
+                                    "Coordinate : " + position + "<br><br>" +
+                                    "Priorità : " + priority + "<br><br>" +
+                                    "Diffusione su social : " + social + "<br><br>" +
+                                    "Status : " + status + "<br><br></html>");
+
+                            System.out.println(openReportlabelInfo.getText());
+
+                            semaphore.release();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    try {
+                        semaphore.acquire();
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+                    }
+
+                    openRightPanel.add(openReportlabelInfo);
+                    openRightPanel.add(pendingRadioBtn);
+                    openRightPanel.add(closedRadioBtn);
+
+                    submitStatusBtn.addActionListener(e1 -> {
+                        DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("reports");
+
+                        if (pendingRadioBtn.isSelected()) {
+                            singleOpenReport.setStatus("Pending_" + singleOpenReport.getId());
+                            openReportIDs.remove(singleOpenReport.getId());
+                            dbr.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
+
+                        } else if (closedRadioBtn.isSelected()) {
+                            singleOpenReport.setStatus("Chiusa_" + singleOpenReport.getId());
+                            openReportIDs.remove(singleOpenReport.getId());
+                            dbr.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
+                        }
+
+                        loadOpenReportsPanel();
+                    });
+
+                    openRightPanel.add(submitStatusBtn);
+                }
+
+                if (e.getClickCount() == 2) {
+                    if (chatInstances.isEmpty()) {
+                        ChatBidirectional chatBidirectional = new ChatBidirectional(singleOpenReport, employee);
+                        chatInstances.add(chatBidirectional);
+                    } else {
+                        boolean isAlreadyOpened = false;
+
+                        for (ChatBidirectional elem : chatInstances) {
+                            if (elem.getReportID().equals(reportId)) {
+                                isAlreadyOpened = true;
+                            }
+                        }
+
+                        if (!isAlreadyOpened) {
+                            ChatBidirectional chatBidirectional = new ChatBidirectional(singleOpenReport, employee);
+                            chatInstances.add(chatBidirectional);
+                        }
+                    }
+                }
+                super.mouseClicked(e);
+            }
+        });
+
+        if (jListOpenReports.isSelectionEmpty()) {
+            openReportlabelInfo.setText("");
+            openRightPanel.remove(openReportlabelInfo);
+            openRightPanel.remove(pendingRadioBtn);
+            openRightPanel.remove(closedRadioBtn);
+            openRightPanel.remove(submitStatusBtn);
+        }
+
+        openRightPanel.setLayout(new BoxLayout(openRightPanel, BoxLayout.Y_AXIS));
+
+        JScrollPane jScrollPane = new JScrollPane(jListOpenReports);
+        openSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, jScrollPane, openRightPanel);
+        openSplitPane.setPreferredSize(new Dimension(750, 520));
+        openSplitPane.setDividerLocation(180);
+        openSplitPane.setOneTouchExpandable(true);
+
+
+        openReportPanel.revalidate();
+        openReportPanel.repaint();
+        openReportPanel.setPreferredSize(new Dimension(800, 600));
+        openReportPanel.add(openSplitPane);
+    }
+
+    private void loadClosedReportPanel() {
+        closedReportPanel.setBackground(Color.YELLOW);
+    }
+
+    private void loadStatsReportPanel() {
+        statsPanel.setBackground(Color.RED);
+    }
+
+    //  Static functions
     public void setLayoutManager() {
         container.setLayout(cardLayout);
         container.add(profilePanel, "0");
-        container.add(reportPanel, "1");
-        container.add(statsPanel, "2");
-        container.add(openReportPanel, "3");
-        container.add(closedReportPanel, "4");
+        container.add(pendingReportPanel, "1");
+        container.add(openReportPanel, "2");
+        container.add(closedReportPanel, "3");
+        container.add(statsPanel, "4");
         cardLayout.show(container, "0");
+        cardShowed = 0;
     }
 
-    //  Panels
+    private void handlePendingReportsButtons() {
+        editBtn.addActionListener(e -> {
+            DialogExample dialogExample = new DialogExample(singlePendingReport);
+
+            if (singlePendingReport.getStatus().equals("Aperta") || singlePendingReport.getStatus().equals("Chiusa")) {
+                pendingReportIDs.remove(singlePendingReport.getId());
+            }
+
+            requestFocus(true);
+            pendingReportPanel.removeAll();
+            pendingReportPanel.add(pendingSplitPane);
+            pendingReportPanel.revalidate();
+            pendingReportPanel.repaint();
+        });
+
+        openStatusBtn.addActionListener(e -> {
+            databaseReference.child(singlePendingReport.getId()).child("status").setValueAsync("Aperta_" + singlePendingReport.getId());
+            pendingReportIDs.remove(singlePendingReport.getId());
+
+            requestFocus(true);
+            pendingReportPanel.removeAll();
+            pendingReportPanel.add(pendingSplitPane);
+            pendingReportPanel.revalidate();
+            pendingReportPanel.repaint();
+        });
+    }
+
     private void loadProfilePanel() {
         uidLabel = new JLabel("UID: " + employee.getUID(), SwingConstants.LEFT);
         emailLabel = new JLabel("e-Mail: " + employee.getEmail());
@@ -117,130 +457,7 @@ public class DashBoard extends JFrame implements KeyListener {
         profilePanel.add(tokenLabel);
         profilePanel.add(istructionText);
         profilePanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-    }
-
-    private void loadOpenReportsPanel() {
-        openReportTitle.setSize(20, 20);
-        openReportTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        jListOpenReports = new JList<>(openReportIDs);
-        jListOpenReports.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        jListOpenReports.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                final String reportId = jListOpenReports.getSelectedValue();
-
-                databaseReference.child(reportId).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        String priority = dataSnapshot.child("priority").getValue().toString();
-                        String object = dataSnapshot.child("object").getValue().toString();
-                        String date = dataSnapshot.child("date").getValue().toString();
-                        String time = dataSnapshot.child("time").getValue().toString();
-                        String uid = dataSnapshot.child("uid").getValue().toString();
-                        String type = dataSnapshot.child("type").getValue().toString();
-                        String description = dataSnapshot.child("description").getValue().toString();
-                        String position = dataSnapshot.child("position").getValue().toString();
-                        String social = dataSnapshot.child("social").getValue().toString();
-
-                        singleOpenReport = new Report(reportId, uid, object, description, date, time, type, position, priority, "Open_" + reportId, social);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-                if (e.getClickCount() == 2) {
-                    if (chatInstances.isEmpty()) {
-                        ChatBidirectional chatBidirectional = new ChatBidirectional(singleOpenReport, employee);
-                        chatInstances.add(chatBidirectional);
-                    } else {
-                        boolean isClean = true;
-
-                        for (ChatBidirectional elem : chatInstances) {
-                            if (elem.getReportID().equals(reportId)) {
-                                isClean = false;
-                            }
-                        }
-
-                        if (isClean) {
-                            ChatBidirectional chatBidirectional = new ChatBidirectional(singleOpenReport, employee);
-                            chatInstances.add(chatBidirectional);
-                        }
-                    }
-                }
-                super.mouseClicked(e);
-            }
-        });
-
-        openReportPanel.add(openReportTitle);
-        openReportPanel.add(jListOpenReports);
-    }
-
-    private void loadClosedReportPanel() {
-        closedReportPanel.setBackground(Color.YELLOW);
-    }
-
-    private void loadStatsReportPanel() {
-        statsPanel.setBackground(Color.RED);
-    }
-
-    //  Utils
-    private void retrieveReportsIDs() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot d : dataSnapshot.getChildren()) {
-                    switch (d.child("status").getValue().toString().split("_")[0]) {
-                        case "Pending":
-                            if (!pendingReportIDs.contains(d.getKey())) {
-                                pendingReportIDs.add(d.getKey());
-                            }
-                            break;
-                        case "Aperta":
-                            if (!openReportIDs.contains(d.getKey())) {
-                                openReportIDs.add(d.getKey());
-                            }
-                            break;
-                        case "Chiusa":
-                            if (!closedReportIDs.contains(d.getKey())) {
-                                closedReportIDs.add(d.getKey());
-                            }
-                            break;
-                    }
-                }
-
-                boolean isThere = false;
-
-                for (String str : pendingReportIDs) {
-                    for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        if (d.child("status").getValue().toString().split("_")[0].equals("Pending")) {
-                            if (d.getKey().equals(str)) {
-                                isThere = true;
-                            }
-                        }
-                    }
-
-                    if (!isThere) {
-                        pendingReportIDs.remove(str);
-                    }
-                }
-
-                semaphore.release();
-                requestFocus(true);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
+    }   //  For the moment is dynamic, but should be static.
 
     public void setLocationAndSize() {
         uidLabel.setBounds(110, 150, 250, 30);
@@ -253,37 +470,43 @@ public class DashBoard extends JFrame implements KeyListener {
         JMenu fileMenu = new JMenu("File");
         JMenu reportMenu = new JMenu("Segnalazioni");
 
+        JMenuItem profileItem = new JMenuItem(new AbstractAction("Profile") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(container, "0");
+                cardShowed = 0;
+            }
+        });
+
         JMenuItem handlingReports = new JMenuItem(new AbstractAction("Pending List") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "1");
+                cardShowed = 1;
             }
         });
 
         JMenuItem openReports = new JMenuItem(new AbstractAction("Aperte") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(container, "3");
+                cardLayout.show(container, "2");
+                cardShowed = 2;
             }
         });
+
         JMenuItem closedReports = new JMenuItem(new AbstractAction("Chiuse") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(container, "4");
+                cardLayout.show(container, "3");
+                cardShowed = 3;
             }
         });
 
         JMenuItem statsReports = new JMenuItem(new AbstractAction("Statistiche") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(container, "2");
-            }
-        });
-
-        JMenuItem profileItem = new JMenuItem(new AbstractAction("Profile") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(container, "0");
+                cardLayout.show(container, "4");
+                cardShowed = 4;
             }
         });
 
@@ -314,7 +537,10 @@ public class DashBoard extends JFrame implements KeyListener {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        openReportPanel.setLayout(new BoxLayout(openReportPanel, BoxLayout.Y_AXIS));
+        //openReportPanel.setLayout(new BoxLayout(openReportPanel, BoxLayout.Y_AXIS));
+
+        statusButtons.add(pendingRadioBtn);
+        statusButtons.add(closedRadioBtn);
     }
 
     @Override
@@ -333,124 +559,26 @@ public class DashBoard extends JFrame implements KeyListener {
                 exception.printStackTrace();
             }
 
-            System.out.println("odsf pressed");
+            System.out.println("{Refreshed}\n"
+                    + "[PendingReports]:\n" + pendingReportIDs
+                    + "\n\n[OpenReports]:\n" + openReportIDs
+                    + "\n\n[ClosedReports]:\n" + closedReportIDs);
 
-            System.out.println(pendingReportIDs);
+            if (cardShowed == 0) {
+                System.out.println("I will do something funny..\n\n");
+            } else if (cardShowed == 1) {
+                loadPendingReportsPanel();
 
-            JList<String> stringJList = new JList<>(pendingReportIDs);
-
-            stringJList.addListSelectionListener(e1 -> {
-                final DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("reports").child(stringJList.getSelectedValue());
-
-                dbr.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        String priority = dataSnapshot.child("priority").getValue().toString();
-                        String object = dataSnapshot.child("object").getValue().toString();
-                        String date = dataSnapshot.child("date").getValue().toString();
-                        String time = dataSnapshot.child("time").getValue().toString();
-                        String uid = dataSnapshot.child("uid").getValue().toString();
-                        String type = dataSnapshot.child("type").getValue().toString();
-                        String description = dataSnapshot.child("description").getValue().toString();
-                        String position = dataSnapshot.child("position").getValue().toString();
-                        String status = dataSnapshot.child("status").getValue().toString();
-                        String social = dataSnapshot.child("social").getValue().toString();
-                        String id = stringJList.getSelectedValue();
-
-                        singlePendingReport = new Report(id, uid, object, description, date, time, type, position, priority, status, social);
-
-                        switch (priority) {
-                            case "0":
-                                stringJList.setSelectionBackground(Color.GREEN);
-                                break;
-                            case "1":
-                                stringJList.setSelectionBackground(Color.YELLOW);
-                                break;
-                            case "2":
-                                stringJList.setSelectionBackground(Color.RED);
-                                break;
-                            default:
-                                stringJList.setSelectionBackground(Color.GRAY);
-                                break;
-                        }
-
-                        labelReportInfo.setText("<html>" +
-                                "Oggetto : " + object + "<br><br>" +
-                                "Data : " + date + "<br><br>" +
-                                "Ora : " + time + "<br><br>" +
-                                "UID : " + uid + "<br><br>" +
-                                "Tipologia : " + type + "<br><br>" +
-                                "Descrizione : " + description + "<br><br>" +
-                                "Coordinate : " + position + "<br><br>" +
-                                "Priorità : " + priority + "<br><br>" +
-                                "Diffusione su social : " + social + "<br><br>" +
-                                "Status : Pending <br><br>" + "</html>");
-
-                        rightPane.add(labelReportInfo);
-                        rightPane.add(handleReport);
-                        rightPane.add(openReport);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-            });
-
-            reportPanel.setPreferredSize(new Dimension(800, 600));
-
-            labelReportInfo.setHorizontalAlignment(SwingConstants.LEFT);
-            labelReportInfo.setVerticalAlignment(SwingConstants.TOP);
-
-            rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.Y_AXIS));
-
-            JScrollPane jScrollPane = new JScrollPane(stringJList);
-
-            splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, jScrollPane, rightPane);
-
-            splitPane.setDividerLocation(180);
-
-            splitPane.setOneTouchExpandable(true);
-            splitPane.setPreferredSize(new Dimension(750, 520));
-
-            reportPanel.removeAll();
-            reportPanel.add(splitPane);
-            reportPanel.revalidate();
-            reportPanel.repaint();
-        }
-    }
-
-    private void handlePendingReportsButtons() {
-        handleReport.addActionListener(e -> {
-            DialogExample dialogExample = new DialogExample(singlePendingReport);
-
-            if (singlePendingReport.getStatus().equals("Aperta") || singlePendingReport.getStatus().equals("Chiusa")) {
-                pendingReportIDs.remove(singlePendingReport.getId());
+            } else if (cardShowed == 2) {
+                loadOpenReportsPanel();
             }
+        }
 
-            requestFocus(true);
-            reportPanel.removeAll();
-            reportPanel.add(splitPane);
-            reportPanel.revalidate();
-            reportPanel.repaint();
-        });
-
-        openReport.addActionListener(e -> {
-            databaseReference.child(singlePendingReport.getId()).child("status").setValueAsync("Aperta_" + singlePendingReport.getId());
-            pendingReportIDs.remove(singlePendingReport.getId());
-
-            requestFocus(true);
-            reportPanel.removeAll();
-            reportPanel.add(splitPane);
-            reportPanel.revalidate();
-            reportPanel.repaint();
-        });
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
 
     }
+
 }
