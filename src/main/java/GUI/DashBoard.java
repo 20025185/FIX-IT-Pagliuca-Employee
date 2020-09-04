@@ -298,8 +298,6 @@ public class DashBoard extends JFrame implements KeyListener {
                                     "Diffusione su social : " + social + "<br><br>" +
                                     "Status : " + status + "<br><br></html>");
 
-                            System.out.println(openReportlabelInfo.getText());
-
                             semaphore.release();
                         }
 
@@ -448,7 +446,10 @@ public class DashBoard extends JFrame implements KeyListener {
         StyleConstants.setAlignment(simpleAttributeSet, StyleConstants.ALIGN_CENTER);
         istructionText.setParagraphAttributes(simpleAttributeSet, false);
         //  Utils
-        String istructions = "\n\nISTRUZIONI PER l'USO\n1. Premere F5 per aggiornare le entries \n2. Non arrabbiarsi è una pre-alpha\n3. Per eventuali suggerimenti pagliuca.manuel@gmail.com\n";
+        String istructions = "\n\nISTRUZIONI PER l'USO" +
+                "\n1. Premere F5 per aggiornare le entries \n" +
+                "2. Nel gestore delle segnalazioni aperte, con un doppio click sul codice della segnalazione sarà possibile aprire la chat con l'utente segnalatore.\n" +
+                "3. Per eventuali suggerimenti pagliuca.manuel@gmail.com\n";
         istructionText.setText(istructions);
 
         profilePanel.setLayout(new BoxLayout(profilePanel, BoxLayout.Y_AXIS));
@@ -536,8 +537,6 @@ public class DashBoard extends JFrame implements KeyListener {
         this.setVisible(true);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //openReportPanel.setLayout(new BoxLayout(openReportPanel, BoxLayout.Y_AXIS));
 
         statusButtons.add(pendingRadioBtn);
         statusButtons.add(closedRadioBtn);

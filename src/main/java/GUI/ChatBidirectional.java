@@ -18,14 +18,15 @@ public class ChatBidirectional extends JFrame {
     private final JTextPane chatArea = new JTextPane();
     private final JTextField textToSend = new JTextField();
     private final JButton sendButton = new JButton("Invia");
+    private final JScrollPane scrollPane = new JScrollPane();
+    private JScrollBar verticalScrollBar = new JScrollBar();
 
     //  Message Components
     private String fullname;
     private String surname;
     private final Report report;
     private final Employee employee;
-    private final StringBuilder chatString = new StringBuilder();
-    //private String chatString = "";
+    private StringBuilder chatString = new StringBuilder();
     private int msgIndex = 0;
 
     //  Firebase
@@ -39,7 +40,6 @@ public class ChatBidirectional extends JFrame {
     ChatBidirectional(Report _report, Employee _employee) {
         this.report = _report;
         this.employee = _employee;
-        chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
 
         retrieveUserData();
         retrieveChatData();
@@ -67,6 +67,7 @@ public class ChatBidirectional extends JFrame {
 
         sendButton.addActionListener(e -> sendingText());
     }
+
 
     private void sendingText() {
         if (!textToSend.getText().isEmpty()) {
@@ -96,11 +97,27 @@ public class ChatBidirectional extends JFrame {
         chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot d : dataSnapshot.getChildren()) {
-                    chatString.append(d.getValue().toString()).append("\n");
-                    //chatString += d.getValue().toString() + "\n";
-                }
+                chatString = new StringBuilder();
                 msgIndex = (int) dataSnapshot.getChildrenCount();
+
+
+                for (int i = 1; i <= msgIndex; i++) {
+                    chatString.append(dataSnapshot.child("msg_" + i).getValue().toString()).append("\n");
+                }
+
+                chatArea.revalidate();
+                chatArea.repaint();
+                chatArea.setText(String.valueOf(chatString));
+
+                scrollPane.revalidate();
+                verticalScrollBar.revalidate();
+
+                scrollPane.repaint();
+                verticalScrollBar.repaint();
+
+                verticalScrollBar = scrollPane.getVerticalScrollBar();
+                verticalScrollBar.setValue(verticalScrollBar.getMaximum());
+
                 semaphore2.release();
             }
 
@@ -121,7 +138,6 @@ public class ChatBidirectional extends JFrame {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 fullname = dataSnapshot.child("fullname").getValue().toString();
                 surname = dataSnapshot.child("surname").getValue().toString();
-
                 semaphore1.release();
             }
 
@@ -149,35 +165,42 @@ public class ChatBidirectional extends JFrame {
         this.setResizable(false);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        this.add(chatPanel);
     }
 
     private void loadElementsOnPanel() {
-        chatArea.setMinimumSize(new Dimension(300, 100));
-        chatArea.setEditable(false);
-        chatArea.setAlignmentX(Component.CENTER_ALIGNMENT);
-        chatArea.setText(String.valueOf(chatString));
+        chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
 
         textToSend.setMaximumSize(new Dimension(400, 1));
         textToSend.setSize(250, 1);
-        textToSend.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        sendButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         SimpleAttributeSet simpleAttributeSet = new SimpleAttributeSet();
         StyleConstants.setForeground(simpleAttributeSet, Color.BLACK);
+
+        chatArea.setMinimumSize(new Dimension(300, 100));
+        chatArea.setEditable(false);
+        chatArea.setText(String.valueOf(chatString));
 
         JScrollPane scrollPane = new JScrollPane(chatArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        verticalScrollBar.setValue(verticalScrollBar.getMaximum());
+
+        scrollPane.setVerticalScrollBar(verticalScrollBar);
         scrollPane.setSize(new Dimension(300, 100));
 
-        chatPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
+        textToSend.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sendButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        chatPanel.add(scrollPane);
         chatPanel.add(textToSend);
         chatPanel.add(sendButton);
+
+        getContentPane().add(chatPanel);
     }
 
-    public String getReportID(){
+    public String getReportID() {
         return report.getId();
     }
 }
