@@ -408,11 +408,12 @@ public class DashBoard extends JFrame implements KeyListener {
     private void loadStatsReportPanel() {
 
         FixItStream favReviewStream = new FixItStream("input-ratings");
-        favReviewStream.run();
+        favReviewStream.execute();
 
-        /*Consumer consumerFavReview = new Consumer("count-fav-issues");
-        consumerFavReview.run();*/
+        Consumer consumerFavReview = new Consumer("count-fav-issues");
+        consumerFavReview.run();
     }
+
 
     //  Static functions
     public void setLayoutManager() {
