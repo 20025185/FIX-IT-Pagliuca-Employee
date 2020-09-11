@@ -3,12 +3,6 @@ package GUI;
 import com.google.firebase.database.*;
 import kafka.members.Consumer;
 import kafka.streams.FixItStream;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.utils.Bytes;
-import org.apache.kafka.streams.*;
-import org.apache.kafka.streams.kstream.*;
-import org.apache.kafka.streams.state.KeyValueStore;
 import utils.Employee;
 import utils.Report;
 
@@ -17,13 +11,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.*;
-
 
 public class DashBoard extends JFrame implements KeyListener {
     //  Elements of JFrame
@@ -72,14 +61,6 @@ public class DashBoard extends JFrame implements KeyListener {
 
     //  Utils
     private int cardShowed;
-
-    public enum ISSUE_TYPE {
-        PROBLEMATICA_STRADALE,
-        PROBLEMATICA_ORIGINE_NATURALE,
-        ATTIVITA_SOSPETTE,
-        ALTRO
-    }
-
 
     //  External
     private final Vector<ChatBidirectional> chatInstances = new Vector<>();

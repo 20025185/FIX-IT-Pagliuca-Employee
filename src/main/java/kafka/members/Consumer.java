@@ -1,6 +1,5 @@
 package kafka.members;
 
-import GUI.DashBoard;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -11,14 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 public class Consumer {
-    private final String bootStrapServer = "localhost:9092";
-    private final String groupId = "fix-it-employee-app";
-    private String topic = "";
+    private final String topic;
 
     private final Logger logger = LoggerFactory.getLogger(Consumer.class.getName());
 
@@ -32,8 +29,6 @@ public class Consumer {
         logger.info("Creating the consumer thread");
 
         ConsumerRunnable myConsumerRunnable = new ConsumerRunnable(
-                bootStrapServer,
-                groupId,
                 topic,
                 latch);
 
@@ -66,19 +61,17 @@ public class Consumer {
     }
 
     public class ConsumerRunnable implements Runnable {
-        private CountDownLatch latch;
-        private KafkaConsumer<String, String> consumer;
+        private final CountDownLatch latch;
+        private final KafkaConsumer<String, String> consumer;
 
-        public ConsumerRunnable(String bootstrapServers,
-                                String groupId,
-                                String topic,
+        public ConsumerRunnable(String topic,
                                 CountDownLatch latch) {
             this.latch = latch;
             Properties config = getConsumerConfig();
-            consumer = new KafkaConsumer<String, String>(config);
+            consumer = new KafkaConsumer<>(config);
 
             if (!topic.isEmpty()) {
-                consumer.subscribe(Arrays.asList(topic));
+                consumer.subscribe(Collections.singletonList(topic));
             } else {
                 logger.info("Error : Topic name is missing!");
             }
@@ -89,6 +82,7 @@ public class Consumer {
             config.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
             config.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
             config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+            String groupId = "fix-it-employee-app";
             config.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
             config.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");    //  latest, none
 

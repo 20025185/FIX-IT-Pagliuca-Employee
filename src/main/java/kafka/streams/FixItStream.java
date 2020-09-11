@@ -2,28 +2,24 @@ package kafka.streams;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.utils.Bytes;
-import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.state.KeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
-import java.util.stream.Stream;
-
 
 public class FixItStream {
-    private String sourceTopic = "";
-    private StreamsBuilder builder;
-    private Properties config;
-    private KafkaStreams streams;
+    private final String sourceTopic;
+    private final StreamsBuilder builder;
+    private final Properties config;
 
     private final Logger logger = LoggerFactory.getLogger(FixItStream.class.getName());
 
@@ -38,6 +34,9 @@ public class FixItStream {
         switch (sourceTopic) {
             case "input-ratings":
                 input_ratingsStreaming();
+                break;
+            case "another-topic":
+                System.out.println("inserire funzione topic");
                 break;
             default:
                 logger.info("Error : Missing input topic!");
@@ -59,7 +58,7 @@ public class FixItStream {
 
         favCountTopics
                 .groupByKey()
-                .count(Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("count-store"))
+                .count(Materialized.as("count-store"))
                 .toStream()
                 .mapValues((key, value) -> Long.toString(value))
                 .to("count-fav-issues", Produced.with(Serdes.String(), Serdes.String()));
@@ -68,7 +67,7 @@ public class FixItStream {
         System.out.println(topology.describe());
 
 
-        streams = new KafkaStreams(builder.build(), config);
+        KafkaStreams streams = new KafkaStreams(builder.build(), config);
         //streams.cleanUp();
         streams.start();
         streams.localThreadsMetadata().forEach(data -> System.out.println());
@@ -125,95 +124,17 @@ public class FixItStream {
 
         String finalStr = separatedValues.get(RATING_JSON_INDEX).substring(start + 1, end);
 
-        if (finalStr.equals("Problematica Stradale")) {
-            return "STRADALE";
-        } else if (finalStr.equals("Problematica di origine naturale")) {
-            return "NATURALE";
-        } else if (finalStr.equals("Attività sospette")) {
-            return "SOSPETTE";
-        } else if (finalStr.equals("Altro")) {
-            return "ALTRO";
+        switch (finalStr) {
+            case "Problematica Stradale":
+                return "STRADALE";
+            case "Problematica di origine naturale":
+                return "NATURALE";
+            case "Attività sospette":
+                return "SOSPETTE";
+            case "Altro":
+                return "ALTRO";
         }
         return "UNDEFINED";
-    }
-
-    private KeyValue<String, String> groupByRating(String key, String valueJsn) {
-        final int RATING_JSON_INDEX = 6;
-
-        List<String> separatedValues;
-
-        String valueStr = valueJsn.substring(1, valueJsn.length() - 1);
-
-        separatedValues = Arrays.asList(valueStr.split(","));
-
-        int end = separatedValues.get(RATING_JSON_INDEX).lastIndexOf("\"");
-        int start = separatedValues.get(RATING_JSON_INDEX)
-                .substring(0, separatedValues.get(RATING_JSON_INDEX).length() - 1)
-                .lastIndexOf("\"");
-
-        String finalStr = separatedValues.get(RATING_JSON_INDEX).substring(start + 1, end);
-
-        double val = Double.parseDouble(finalStr);
-
-        if (val >= 4.0) {
-            separatedValues = new ArrayList<>();
-            separatedValues.add(finalStr);
-
-            System.out.println(valueJsn);
-            return new KeyValue<String, String>(key, valueJsn);
-        }
-        return null;
-    }
-
-
-    private boolean checkRatings(String valueJSON) {
-        final int RATING_JSON_INDEX = 6;
-
-        List<String> separatedValues;
-
-        String value = valueJSON.substring(1, valueJSON.length() - 1);
-
-        separatedValues = Arrays.asList(value.split(","));
-
-        int end = separatedValues.get(RATING_JSON_INDEX).lastIndexOf("\"");
-        int start = separatedValues.get(RATING_JSON_INDEX)
-                .substring(0, separatedValues.get(RATING_JSON_INDEX).length() - 1)
-                .lastIndexOf("\"");
-        String finalStr = separatedValues.get(RATING_JSON_INDEX).substring(start + 1, end);
-
-        double val = Double.parseDouble(finalStr);
-
-        if (val >= 4.0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private Iterable<?> parseRatings(String value) {
-        final int RATING_JSON_INDEX = 6;
-
-        List<String> separatedValues;
-
-        value = value.substring(1, value.length() - 1);
-
-        separatedValues = Arrays.asList(value.split(","));
-
-        int end = separatedValues.get(RATING_JSON_INDEX).lastIndexOf("\"");
-        int start = separatedValues.get(RATING_JSON_INDEX)
-                .substring(0, separatedValues.get(RATING_JSON_INDEX).length() - 1)
-                .lastIndexOf("\"");
-        String finalStr = separatedValues.get(RATING_JSON_INDEX).substring(start + 1, end);
-
-        double val = Double.parseDouble(finalStr);
-
-        if (val >= 4.0) {
-            separatedValues = new ArrayList<>();
-            separatedValues.add(finalStr);
-            return separatedValues;
-        }
-
-        return null;
     }
 
     private boolean checkRating(String valueJson) {
@@ -225,6 +146,5 @@ public class FixItStream {
         }
         return false;
     }
-
 
 }
