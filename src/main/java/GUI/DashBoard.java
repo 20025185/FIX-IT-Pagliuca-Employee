@@ -1,6 +1,14 @@
 package GUI;
 
 import com.google.firebase.database.*;
+import kafka.members.Consumer;
+import kafka.streams.FixItStream;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.utils.Bytes;
+import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.kstream.*;
+import org.apache.kafka.streams.state.KeyValueStore;
 import utils.Employee;
 import utils.Report;
 
@@ -9,11 +17,13 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+
 
 public class DashBoard extends JFrame implements KeyListener {
     //  Elements of JFrame
@@ -62,6 +72,14 @@ public class DashBoard extends JFrame implements KeyListener {
 
     //  Utils
     private int cardShowed;
+
+    public enum ISSUE_TYPE {
+        PROBLEMATICA_STRADALE,
+        PROBLEMATICA_ORIGINE_NATURALE,
+        ATTIVITA_SOSPETTE,
+        ALTRO
+    }
+
 
     //  External
     private final Vector<ChatBidirectional> chatInstances = new Vector<>();
@@ -321,12 +339,12 @@ public class DashBoard extends JFrame implements KeyListener {
                         DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("reports");
 
                         if (pendingRadioBtn.isSelected()) {
-                            singleOpenReport.setStatus("Pending_" + singleOpenReport.getId());
+                            singleOpenReport.setStatus("Pending_" + singleOpenReport.getUid());
                             openReportIDs.remove(singleOpenReport.getId());
                             dbr.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
 
                         } else if (closedRadioBtn.isSelected()) {
-                            singleOpenReport.setStatus("Chiusa_" + singleOpenReport.getId());
+                            singleOpenReport.setStatus("Chiusa_" + singleOpenReport.getUid());
                             openReportIDs.remove(singleOpenReport.getId());
                             dbr.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
                         }
@@ -376,7 +394,6 @@ public class DashBoard extends JFrame implements KeyListener {
         openSplitPane.setDividerLocation(180);
         openSplitPane.setOneTouchExpandable(true);
 
-
         openReportPanel.revalidate();
         openReportPanel.repaint();
         openReportPanel.setPreferredSize(new Dimension(800, 600));
@@ -384,11 +401,17 @@ public class DashBoard extends JFrame implements KeyListener {
     }
 
     private void loadClosedReportPanel() {
+
         closedReportPanel.setBackground(Color.YELLOW);
     }
 
     private void loadStatsReportPanel() {
-        statsPanel.setBackground(Color.RED);
+
+        FixItStream favReviewStream = new FixItStream("input-ratings");
+        favReviewStream.run();
+
+        /*Consumer consumerFavReview = new Consumer("count-fav-issues");
+        consumerFavReview.run();*/
     }
 
     //  Static functions
@@ -419,7 +442,7 @@ public class DashBoard extends JFrame implements KeyListener {
         });
 
         openStatusBtn.addActionListener(e -> {
-            databaseReference.child(singlePendingReport.getId()).child("status").setValueAsync("Aperta_" + singlePendingReport.getId());
+            databaseReference.child(singlePendingReport.getId()).child("status").setValueAsync("Aperta_" + singlePendingReport.getUid());
             pendingReportIDs.remove(singlePendingReport.getId());
 
             requestFocus(true);
@@ -430,7 +453,7 @@ public class DashBoard extends JFrame implements KeyListener {
         });
     }
 
-    private void loadProfilePanel() {
+    private void loadProfilePanel() {   //  For the moment is dynamic, but should be static.
         uidLabel = new JLabel("UID: " + employee.getUID(), SwingConstants.LEFT);
         emailLabel = new JLabel("e-Mail: " + employee.getEmail());
         tokenLabel = new JLabel("TokenID: " + employee.getTokenID());
@@ -458,7 +481,7 @@ public class DashBoard extends JFrame implements KeyListener {
         profilePanel.add(tokenLabel);
         profilePanel.add(istructionText);
         profilePanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-    }   //  For the moment is dynamic, but should be static.
+    }
 
     public void setLocationAndSize() {
         uidLabel.setBounds(110, 150, 250, 30);
@@ -503,11 +526,20 @@ public class DashBoard extends JFrame implements KeyListener {
             }
         });
 
-        JMenuItem statsReports = new JMenuItem(new AbstractAction("Statistiche") {
+        JMenu statsMenu = new JMenu("Statistiche");
+
+        JMenuItem statReviewReports = new JMenuItem(new AbstractAction("Recensioni") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "4");
                 cardShowed = 4;
+            }
+        });
+
+        JMenuItem statReports = new JMenuItem(new AbstractAction("Segnalazioni") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
             }
         });
 
@@ -519,15 +551,22 @@ public class DashBoard extends JFrame implements KeyListener {
             }
         });
 
-        this.setJMenuBar(jMenuBar);
-        jMenuBar.add(fileMenu);
-        jMenuBar.add(reportMenu);
-        fileMenu.add(profileItem);
-        fileMenu.add(exitItem);
+        statsMenu.add(statReviewReports);
+        statsMenu.add(statReports);
+
         reportMenu.add(handlingReports);
         reportMenu.add(openReports);
         reportMenu.add(closedReports);
-        reportMenu.add(statsReports);
+        reportMenu.add(statsMenu);
+
+        fileMenu.add(profileItem);
+        fileMenu.add(exitItem);
+
+        jMenuBar.add(fileMenu);
+        jMenuBar.add(reportMenu);
+
+        this.setJMenuBar(jMenuBar);
+
     }
 
     private void initialize() {
@@ -560,12 +599,11 @@ public class DashBoard extends JFrame implements KeyListener {
 
             System.out.println("{Refreshed}\n"
                     + "[PendingReports]:\n" + pendingReportIDs
+
                     + "\n\n[OpenReports]:\n" + openReportIDs
                     + "\n\n[ClosedReports]:\n" + closedReportIDs);
 
-            if (cardShowed == 0) {
-                System.out.println("I will do something funny..\n\n");
-            } else if (cardShowed == 1) {
+            if (cardShowed == 1) {
                 loadPendingReportsPanel();
 
             } else if (cardShowed == 2) {

@@ -34,8 +34,9 @@ public class DialogExample {
 
         edit.addActionListener(e -> {
             report.setPriority(Objects.requireNonNull(priority.getSelectedItem()).toString());
-            report.setStatus(Objects.requireNonNull(status.getSelectedItem()).toString() + "_" + report.getId());
+            report.setStatus(Objects.requireNonNull(status.getSelectedItem()).toString() + "_" + report.getUid());
             report.setObject(object.getText());
+            System.out.println(report.toString());
 
             databaseReference = firebaseDatabase.getReference("reports").child(report.getId());
             databaseReference.setValueAsync(report);
