@@ -11,13 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 public class Consumer {
     private final String topic;
-
     private final Logger logger = LoggerFactory.getLogger(Consumer.class.getName());
+    private final HashMap<String, String> recordKeysAndValues = new HashMap<>();
 
     public Consumer(String topic) {
         this.topic = topic;
@@ -25,8 +26,8 @@ public class Consumer {
 
     public void run() {
         CountDownLatch latch = new CountDownLatch(1);
-
         logger.info("Creating the consumer thread");
+
 
         ConsumerRunnable myConsumerRunnable = new ConsumerRunnable(
                 topic,
@@ -49,15 +50,10 @@ public class Consumer {
             logger.info("Application has exited");
         }));
 
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            logger.error("Application got interrupted. " + e);
-            e.printStackTrace();
-        } finally {
-            logger.info("Application is closing");
-        }
+    }
 
+    public HashMap<String, String> getRecordKeysAndValues() {
+        return recordKeysAndValues;
     }
 
     public class ConsumerRunnable implements Runnable {
@@ -84,7 +80,7 @@ public class Consumer {
             config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
             String groupId = "fix-it-employee-app";
             config.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-            config.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");    //  latest, none
+            config.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");    //  latest, none
 
             return config;
         }
@@ -92,15 +88,17 @@ public class Consumer {
         @Override
         public void run() {
             try {
-                //  poll for new data
                 while (true) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 
                     for (ConsumerRecord<String, String> record : records) {
                         logger.info("Key: " + record.key() + ", Value: " + record.value());
                         logger.info("Partition; " + record.partition() + ", Offset: " + record.offset());
+
+                        recordKeysAndValues.put(record.key(), record.value());
                     }
                 }
+
             } catch (WakeupException e) {
                 logger.info("Received shutdown signal");
             } finally {

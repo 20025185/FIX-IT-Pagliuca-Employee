@@ -65,8 +65,7 @@ public class FixItStream {
 
         final Topology topology = builder.build();
         System.out.println(topology.describe());
-
-
+        
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         //streams.cleanUp();
         streams.start();

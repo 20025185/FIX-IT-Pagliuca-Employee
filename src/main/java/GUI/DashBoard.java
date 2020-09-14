@@ -11,6 +11,9 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.*;
 
@@ -328,6 +331,11 @@ public class DashBoard extends JFrame implements KeyListener {
                             singleOpenReport.setStatus("Chiusa_" + singleOpenReport.getUid());
                             openReportIDs.remove(singleOpenReport.getId());
                             dbr.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
+
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss");
+                            Date date = new Date(System.currentTimeMillis());
+                            String dateFormatted = formatter.format(date);
+                            dbr.child(singleOpenReport.getId()).child("data_chiusura").setValueAsync(dateFormatted);
                         }
 
                         loadOpenReportsPanel();
@@ -382,19 +390,52 @@ public class DashBoard extends JFrame implements KeyListener {
     }
 
     private void loadClosedReportPanel() {
-
         closedReportPanel.setBackground(Color.YELLOW);
     }
 
-    private void loadStatsReportPanel() {
+    HashMap<String, String> stringStringHashMap = new HashMap<>();
 
+    private void loadStatsReportPanel() {
         FixItStream favReviewStream = new FixItStream("input-ratings");
         favReviewStream.execute();
 
         Consumer consumerFavReview = new Consumer("count-fav-issues");
         consumerFavReview.run();
-    }
 
+        statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
+
+        JLabel labelNaturali = new JLabel("Problematiche di origine naturale : ");
+        JLabel labelAltro = new JLabel("Altro : ");
+        JLabel labelSospette = new JLabel("Attività sospette : ");
+        JLabel labelStradali = new JLabel("Problematiche stradali : ");
+
+        statsPanel.add(labelNaturali);
+        statsPanel.add(labelAltro);
+        statsPanel.add(labelSospette);
+        statsPanel.add(labelStradali);
+
+        Runnable r = () -> {
+            stringStringHashMap = consumerFavReview.getRecordKeysAndValues();
+
+            labelNaturali.setText("Problematiche di origine naturale : " + stringStringHashMap.get("naturale"));
+            labelAltro.setText("Altro : " + stringStringHashMap.get("altro"));
+            labelSospette.setText("Attività sospette : " + stringStringHashMap.get("sospette"));
+            labelStradali.setText("Problematiche stradali : " + stringStringHashMap.get("stradale"));
+
+            statsPanel.removeAll();
+            statsPanel.repaint();
+            statsPanel.revalidate();
+
+            statsPanel.add(labelNaturali);
+            statsPanel.add(labelAltro);
+            statsPanel.add(labelSospette);
+            statsPanel.add(labelStradali);
+        };
+
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleAtFixedRate(r, 1500, 100, TimeUnit.MILLISECONDS);
+
+    }
 
     //  Static functions
     public void setLayoutManager() {
@@ -410,7 +451,7 @@ public class DashBoard extends JFrame implements KeyListener {
 
     private void handlePendingReportsButtons() {
         editBtn.addActionListener(e -> {
-            DialogExample dialogExample = new DialogExample(singlePendingReport);
+            EditReportFrame editReportFrame = new EditReportFrame(singlePendingReport);
 
             if (singlePendingReport.getStatus().equals("Aperta") || singlePendingReport.getStatus().equals("Chiusa")) {
                 pendingReportIDs.remove(singlePendingReport.getId());
@@ -450,6 +491,7 @@ public class DashBoard extends JFrame implements KeyListener {
         SimpleAttributeSet simpleAttributeSet = new SimpleAttributeSet();
         StyleConstants.setAlignment(simpleAttributeSet, StyleConstants.ALIGN_CENTER);
         istructionText.setParagraphAttributes(simpleAttributeSet, false);
+
         //  Utils
         String istructions = "\n\nISTRUZIONI PER l'USO" +
                 "\n1. Premere F5 per aggiornare le entries \n" +

@@ -5,9 +5,11 @@ import utils.Report;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 
-public class DialogExample {
+public class EditReportFrame {
 
     private final String[] priorities = {"0", "1", "2"};
     private final String[] possibleStatus = {"Pending", "Aperta", "Chiusa"};
@@ -16,12 +18,11 @@ public class DialogExample {
     private final JTextField object = new JTextField(10);
     private final JComboBox<String> status = new JComboBox<>(possibleStatus);
 
-    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference databaseReference;
+    private final DatabaseReference databaseReference;
 
-    DialogExample(Report report) {
+    EditReportFrame(Report report) {
         JFrame f = new JFrame();
-        JDialog d = new JDialog(f, "Dialog Example", true);
+        JDialog d = new JDialog(f, "Modifica", true);
         d.setLayout(new FlowLayout());
         object.setText(report.getObject());
         JButton edit = new JButton("Modifica");
@@ -32,15 +33,24 @@ public class DialogExample {
         status.setEnabled(true);
         edit.setEnabled(true);
 
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("reports").child(report.getId());
+
         edit.addActionListener(e -> {
             report.setPriority(Objects.requireNonNull(priority.getSelectedItem()).toString());
             report.setStatus(Objects.requireNonNull(status.getSelectedItem()).toString() + "_" + report.getUid());
             report.setObject(object.getText());
-            System.out.println(report.toString());
 
-            databaseReference = firebaseDatabase.getReference("reports").child(report.getId());
-            databaseReference.setValueAsync(report);
-
+            databaseReference.child("priority").setValueAsync(priority.getSelectedItem().toString());
+            databaseReference.child("status").setValueAsync(status.getSelectedItem().toString() + "_" + report.getUid());
+            databaseReference.child("object").setValueAsync(object.getText());
+            if (report.getStatus().contains("Chiusa")) {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss");
+                Date date = new Date(System.currentTimeMillis());
+                String dateFormatted = formatter.format(date);
+                databaseReference.child("data_chiusura").setValueAsync(dateFormatted);
+            }
+            
             object.setEnabled(false);
             priority.setEnabled(false);
             status.setEnabled(false);

@@ -38,7 +38,7 @@ public class Report {
         this.id = id;
     }
 
-    public Report(){
+    public Report() {
         this.id = "";
         this.uid = "";
         this.object = "";
