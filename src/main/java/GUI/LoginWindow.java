@@ -2,7 +2,7 @@ package GUI;
 
 import com.google.firebase.database.*;
 import utils.Employee;
-import utils.FirebaseAuthAPI;
+import utils.FirebaseDatabase;
 
 import javax.swing.*;
 import java.awt.*;
@@ -103,17 +103,16 @@ public class LoginWindow extends JFrame implements ActionListener {
         final String email = getEmail();
         final String psw = getPsw();
 
-        FirebaseAuthAPI firebaseAuthAPI = new FirebaseAuthAPI();
+        FirebaseDatabase firebaseDatabase = new FirebaseDatabase();
 
         try {
-            employee = firebaseAuthAPI.auth(email, psw);
+            employee = firebaseDatabase.auth(email, psw);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
 
-
         if (!employee.getUID().isEmpty()) {
-            DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("employee");
+            DatabaseReference dbr = com.google.firebase.database.FirebaseDatabase.getInstance().getReference("employee");
             dbr.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -128,7 +127,7 @@ public class LoginWindow extends JFrame implements ActionListener {
             });
 
             if (isEmployee) {
-                DashBoard dashBoard = new DashBoard(employee);
+                Board board = new Board(employee);
                 this.dispose();
             }
 

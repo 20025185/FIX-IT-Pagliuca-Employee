@@ -37,7 +37,7 @@ public class ChatBidirectional extends JFrame {
     //  Utils
     private Semaphore semaphore1, semaphore2;
 
-    ChatBidirectional(Report _report, Employee _employee) {
+    public ChatBidirectional(Report _report, Employee _employee) {
         this.report = _report;
         this.employee = _employee;
 

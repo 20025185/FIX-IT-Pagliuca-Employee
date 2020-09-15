@@ -10,40 +10,38 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
-public class FirebaseAuthAPI {
+public class FirebaseDatabase {
     private final String BASE_URL = "https://identitytoolkit.googleapis.com/v1/accounts:";
-    private final String OPERATION_AUTH = "signInWithPassword";
-    private final String OPERATION_REFRESH_TOKEN = "token";
-    private final String OPERATION_ACCOUNT_INFO = "lookup";
 
-    private String firebaseKey;
-    private static FirebaseAuthAPI instance = null;
+    private final String firebaseKey;
+    private static FirebaseDatabase instance = null;
 
-    public FirebaseAuthAPI() {
+    public FirebaseDatabase() {
         firebaseKey = "AIzaSyAvOgNrXpFdMpNhi7KgyXq0Bav7WejwRk0";
     }
 
-    public static FirebaseAuthAPI getInstance() {
+    public static FirebaseDatabase getInstance() {
         if (instance == null) {
-            instance = new FirebaseAuthAPI();
+            instance = new FirebaseDatabase();
         }
         return instance;
     }
 
     public Employee auth(String username, String password) throws Exception {
         HttpURLConnection urlRequest = null;
-        String uid = null;
 
         Employee employee = new Employee();
 
         try {
+            String OPERATION_AUTH = "signInWithPassword";
             URL url = new URL(BASE_URL + OPERATION_AUTH + "?key=" + firebaseKey);
             urlRequest = (HttpURLConnection) url.openConnection();
             urlRequest.setDoOutput(true);
             urlRequest.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             OutputStream os = urlRequest.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+            OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
             osw.write("{\"email\":\"" + username + "\",\"password\":\"" + password + "\",\"returnSecureToken\":true}");
             osw.flush();
             osw.close();
@@ -59,6 +57,7 @@ public class FirebaseAuthAPI {
         } catch (Exception e) {
             return null;
         } finally {
+            assert urlRequest != null;
             urlRequest.disconnect();
         }
         return employee;
@@ -66,15 +65,16 @@ public class FirebaseAuthAPI {
 
     public String getAccountInfo(String token) throws Exception {
         HttpURLConnection urlRequest = null;
-        String email = null;
+        String email;
 
         try {
+            String OPERATION_ACCOUNT_INFO = "lookup";
             URL url = new URL(BASE_URL + OPERATION_ACCOUNT_INFO + "?key=" + firebaseKey);
             urlRequest = (HttpURLConnection) url.openConnection();
             urlRequest.setDoOutput(true);
             urlRequest.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             OutputStream os = urlRequest.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+            OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
             osw.write("{\"idToken\":\"" + token + "\"}");
             osw.flush();
             osw.close();
@@ -89,9 +89,12 @@ public class FirebaseAuthAPI {
         } catch (Exception e) {
             return null;
         } finally {
+            assert urlRequest != null;
             urlRequest.disconnect();
         }
         return email;
 
     }
+
+
 }

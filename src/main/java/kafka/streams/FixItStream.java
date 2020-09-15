@@ -65,9 +65,9 @@ public class FixItStream {
 
         final Topology topology = builder.build();
         System.out.println(topology.describe());
-        
+
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
-        //streams.cleanUp();
+
         streams.start();
         streams.localThreadsMetadata().forEach(data -> System.out.println());
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));

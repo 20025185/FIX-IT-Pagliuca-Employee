@@ -1,4 +1,4 @@
-import GUI.DashBoard;
+import GUI.Board;
 import GUI.LoginWindow;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -16,7 +16,7 @@ public class Main {
 
         //  testing
         Employee employee = new Employee("asdfdas@test.it", "PGLMNKL", "Manuel", "Pagliuca");
-        DashBoard dashBoard = new DashBoard(employee);
+        Board board = new Board(employee);
     }
 
     public static void initializeFirebase() throws IOException {
