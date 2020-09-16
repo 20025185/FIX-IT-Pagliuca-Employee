@@ -1,5 +1,7 @@
-package GUI;
+package GUI.others;
 
+import GUI.Board;
+import GUI.dialogs.ChatBidirectional;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -108,7 +110,6 @@ public class Utils {
         board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-
     public void retrieveReportsIDs(Vector<String> pendingReportIDs,
                                    Vector<String> openReportIDs,
                                    Vector<String> closedReportIDs,
@@ -173,6 +174,23 @@ public class Utils {
                 vectorIDs.remove(str);
             }
         }
+    }
+
+    public void setLayoutManager(Container container, CardLayout cardLayout, JPanel profilePanel, JPanel pendingReportPanel,
+                                 JPanel openReportPanel,
+                                 JPanel closedReportPanel,
+                                 JPanel statsReviewsPanel,
+                                 JPanel statsReportsPanel,
+                                 Board board) {
+        container.setLayout(cardLayout);
+        container.add(profilePanel, "0");
+        container.add(pendingReportPanel, "1");
+        container.add(openReportPanel, "2");
+        container.add(closedReportPanel, "3");
+        container.add(statsReviewsPanel, "4");
+        container.add(statsReportsPanel, "5");
+        cardLayout.show(container, "0");
+        board.setCardShowed(0);
     }
 
 

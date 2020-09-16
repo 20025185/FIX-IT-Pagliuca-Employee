@@ -1,5 +1,6 @@
-package GUI;
+package GUI.dialogs;
 
+import GUI.Board;
 import com.google.firebase.database.*;
 import utils.Employee;
 import utils.FirebaseDatabase;
@@ -20,7 +21,7 @@ public class LoginWindow extends JFrame implements ActionListener {
     private final JButton loginButton = new JButton("LOGIN");
 
     private boolean isEmployee = false;
-    private  Employee employee;
+    private Employee employee;
 
     public LoginWindow() {
         initialize();
@@ -28,26 +29,6 @@ public class LoginWindow extends JFrame implements ActionListener {
         setLocationAndSize();
         addComponents();
         addActionEvent();
-    }
-
-    public void setLayoutManager() {
-        container.setLayout(null);
-    }
-
-    public void setLocationAndSize() {
-        emailLabel.setBounds(30, 10, 50, 30);
-        emailField.setBounds(90, 10, 150, 30);
-        pswLabel.setBounds(20, 50, 100, 30);
-        passwordField.setBounds(90, 50, 150, 30);
-        loginButton.setBounds(105, 100, 100, 30);
-    }
-
-    public void addComponents() {
-        container.add(emailLabel);
-        container.add(emailField);
-        container.add(pswLabel);
-        container.add(passwordField);
-        container.add(loginButton);
     }
 
     private void initialize() {
@@ -80,26 +61,7 @@ public class LoginWindow extends JFrame implements ActionListener {
         });
     }
 
-    private void addActionEvent() {
-        loginButton.addActionListener(this);
-    }
-
-    private String getEmail() {
-        return emailField.getText();
-    }
-
-    private String getPsw() {
-        return String.valueOf(passwordField.getPassword());
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == loginButton) {
-            login();
-        }
-    }
-
-    public void login(){
+    public void login() {
         final String email = getEmail();
         final String psw = getPsw();
 
@@ -132,6 +94,45 @@ public class LoginWindow extends JFrame implements ActionListener {
             }
 
         }
+    }
+
+    public void setLayoutManager() {
+        container.setLayout(null);
+    }
+
+    public void setLocationAndSize() {
+        emailLabel.setBounds(30, 10, 50, 30);
+        emailField.setBounds(90, 10, 150, 30);
+        pswLabel.setBounds(20, 50, 100, 30);
+        passwordField.setBounds(90, 50, 150, 30);
+        loginButton.setBounds(105, 100, 100, 30);
+    }
+
+    public void addComponents() {
+        container.add(emailLabel);
+        container.add(emailField);
+        container.add(pswLabel);
+        container.add(passwordField);
+        container.add(loginButton);
+    }
+
+    private void addActionEvent() {
+        loginButton.addActionListener(this);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == loginButton) {
+            login();
+        }
+    }
+
+    private String getEmail() {
+        return emailField.getText();
+    }
+
+    private String getPsw() {
+        return String.valueOf(passwordField.getPassword());
     }
 
 }

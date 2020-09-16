@@ -1,8 +1,7 @@
-package GUI;
+package GUI.dialogs;
 
 import com.google.firebase.database.*;
 import utils.Report;
-
 import javax.swing.*;
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -20,7 +19,7 @@ public class EditReportFrame {
 
     private final DatabaseReference databaseReference;
 
-    EditReportFrame(Report report) {
+    public EditReportFrame(Report report) {
         JFrame f = new JFrame();
         JDialog d = new JDialog(f, "Modifica", true);
         d.setLayout(new FlowLayout());

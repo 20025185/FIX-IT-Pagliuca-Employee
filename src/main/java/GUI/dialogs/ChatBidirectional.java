@@ -1,4 +1,4 @@
-package GUI;
+package GUI.dialogs;
 
 import com.google.firebase.database.*;
 import utils.Employee;
