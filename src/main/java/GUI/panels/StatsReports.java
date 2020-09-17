@@ -9,7 +9,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import javax.swing.*;
 import java.awt.*;
 
-public class StatsReportsPanel extends JPanel {
+public class StatsReports extends JPanel {
 
     public void loadStatsEmployee() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();

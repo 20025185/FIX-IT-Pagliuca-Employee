@@ -33,7 +33,6 @@ public class Utils {
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "1");
                 board.setCardShowed(1);
-
             }
         });
 
@@ -42,7 +41,6 @@ public class Utils {
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "2");
                 board.setCardShowed(2);
-
             }
         });
 
@@ -51,7 +49,6 @@ public class Utils {
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "3");
                 board.setCardShowed(3);
-
             }
         });
 
@@ -62,7 +59,6 @@ public class Utils {
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "4");
                 board.setCardShowed(4);
-
             }
         });
 
@@ -71,7 +67,14 @@ public class Utils {
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "5");
                 board.setCardShowed(5);
+            }
+        });
 
+        JMenuItem sendReport = new JMenuItem(new AbstractAction("Invia segnalazione") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(container, "6");
+                board.setCardShowed(6);
             }
         });
 
@@ -90,6 +93,7 @@ public class Utils {
         reportMenu.add(openReports);
         reportMenu.add(closedReports);
         reportMenu.add(statsMenu);
+        reportMenu.add(sendReport);
 
         fileMenu.add(profileItem);
         fileMenu.add(exitItem);
@@ -181,6 +185,7 @@ public class Utils {
                                  JPanel closedReportPanel,
                                  JPanel statsReviewsPanel,
                                  JPanel statsReportsPanel,
+                                 JPanel createReportPanel,
                                  Board board) {
         container.setLayout(cardLayout);
         container.add(profilePanel, "0");
@@ -189,9 +194,9 @@ public class Utils {
         container.add(closedReportPanel, "3");
         container.add(statsReviewsPanel, "4");
         container.add(statsReportsPanel, "5");
+        container.add(createReportPanel, "6");
         cardLayout.show(container, "0");
         board.setCardShowed(0);
     }
-
 
 }

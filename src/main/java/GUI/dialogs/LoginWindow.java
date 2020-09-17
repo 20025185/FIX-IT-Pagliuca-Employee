@@ -3,7 +3,7 @@ package GUI.dialogs;
 import GUI.Board;
 import com.google.firebase.database.*;
 import utils.Employee;
-import utils.FirebaseDatabase;
+import utils.FirebaseAPI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -65,10 +65,10 @@ public class LoginWindow extends JFrame implements ActionListener {
         final String email = getEmail();
         final String psw = getPsw();
 
-        FirebaseDatabase firebaseDatabase = new FirebaseDatabase();
+        FirebaseAPI firebaseAPI = new FirebaseAPI();
 
         try {
-            employee = firebaseDatabase.auth(email, psw);
+            employee = firebaseAPI.auth(email, psw);
         } catch (Exception exception) {
             exception.printStackTrace();
         }

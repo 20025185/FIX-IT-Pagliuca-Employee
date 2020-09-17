@@ -28,7 +28,6 @@ public class Consumer {
         CountDownLatch latch = new CountDownLatch(1);
         logger.info("Creating the consumer thread");
 
-
         ConsumerRunnable myConsumerRunnable = new ConsumerRunnable(
                 topic,
                 latch);

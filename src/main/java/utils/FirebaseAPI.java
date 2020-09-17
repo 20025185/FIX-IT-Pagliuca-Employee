@@ -12,19 +12,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class FirebaseDatabase {
+public class FirebaseAPI {
     private final String BASE_URL = "https://identitytoolkit.googleapis.com/v1/accounts:";
 
     private final String firebaseKey;
-    private static FirebaseDatabase instance = null;
+    private static FirebaseAPI instance = null;
 
-    public FirebaseDatabase() {
+    public FirebaseAPI() {
         firebaseKey = "AIzaSyAvOgNrXpFdMpNhi7KgyXq0Bav7WejwRk0";
     }
 
-    public static FirebaseDatabase getInstance() {
+    public static FirebaseAPI getInstance() {
         if (instance == null) {
-            instance = new FirebaseDatabase();
+            instance = new FirebaseAPI();
         }
         return instance;
     }

@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Vector;
 
-public class PendingReportsPanel extends JPanel {
+public class PendingReports extends JPanel {
     private final DatabaseReference databaseReference;
     private JSplitPane pendingSplitPane = new JSplitPane();
     private final JButton editBtn = new JButton("Edit");
@@ -21,7 +21,7 @@ public class PendingReportsPanel extends JPanel {
     private int lastSelectedIndex;
     private int lastIndexPriorityColour;
 
-    public PendingReportsPanel(DatabaseReference ref) {
+    public PendingReports(DatabaseReference ref) {
         this.databaseReference = ref;
 
         labelReportInfo.setHorizontalAlignment(SwingConstants.LEFT);
@@ -125,7 +125,7 @@ public class PendingReportsPanel extends JPanel {
                     String social = dataSnapshot.child("social").getValue().toString();
                     String id = stringJList.getSelectedValue();
 
-                    singlePendingReport = new Report(id, uid, object, description, date, time, type, position, priority, status, social);
+                    singlePendingReport = new Report(id, uid, object, description, date, time, type, position, priority, status, Boolean.parseBoolean(social));
 
                     switch (priority) {
                         case "0":

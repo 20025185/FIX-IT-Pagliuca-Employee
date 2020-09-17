@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
-public class OpenReportsPanel extends JPanel {
+public class OpenReports extends JPanel {
     private JSplitPane openSplitPane = new JSplitPane();
     private final JPanel rightComponentPane = new JPanel();
     private final JLabel openReportTitle = new JLabel("Segnalazioni Aperte");
@@ -130,7 +130,8 @@ public class OpenReportsPanel extends JPanel {
                             String status = dataSnapshot.child("status").getValue().toString().split("_")[0];
                             String social = dataSnapshot.child("social").getValue().toString();
 
-                            singleOpenReport = new Report(reportId, uid, object, description, date, time, type, position, priority, "Aperta_" + reportId, social);
+                            singleOpenReport = new Report(reportId, uid, object, description,
+                                    date, time, type, position, priority, "Aperta_" + reportId, Boolean.parseBoolean(social));
 
                             switch (priority) {
                                 case "0":
@@ -186,13 +187,14 @@ public class OpenReportsPanel extends JPanel {
                         if (pendingRadioBtn.isSelected()) {
                             singleOpenReport.setStatus("Pending_" + singleOpenReport.getUid());
                             openReportIDs.remove(singleOpenReport.getId());
-                            jListOpenReports.remove(lastSelectedIndex);
+                            //jListOpenReports.remove(lastSelectedIndex);
                             databaseReference.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
                         } else if (closedRadioBtn.isSelected()) {
                             singleOpenReport.setStatus("Chiusa_" + singleOpenReport.getUid());
                             openReportIDs.remove(singleOpenReport.getId());
                             databaseReference.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
-                            jListOpenReports.remove(lastSelectedIndex);
+
+                            //jListOpenReports.remove(lastSelectedIndex);
 
                             SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss");
                             Date date = new Date(System.currentTimeMillis());

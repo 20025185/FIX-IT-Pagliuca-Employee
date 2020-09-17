@@ -1,17 +1,18 @@
 package utils;
 
 public class Report {
-    private String id;
     private String uid;
-    private String object;
-    private String description;
+    private String id;
     private String date;
     private String time;
-    private String type;
+    private String object;
     private String position;
-    private String priority;
-    private String status;
-    private String social;
+    private String description;
+    private String type;
+    private String rating;
+    private String priority = "-1";
+    private String status = "undefined";
+    private boolean social;
 
     @Override
     public String toString() {
@@ -49,10 +50,12 @@ public class Report {
         this.position = "";
         this.priority = "";
         this.status = "";
-        this.social = "";
+        this.social = false;
     }
 
-    public Report(String id, String uid, String object, String description, String date, String time, String type, String position, String priority, String status, String social) {
+    public Report(String id, String uid, String object, String description,
+                  String date, String time, String type, String position,
+                  String priority, String status, boolean social) {
         this.id = id;
         this.uid = uid;
         this.object = object;
@@ -106,11 +109,11 @@ public class Report {
         this.status = status;
     }
 
-    public String getSocial() {
+    public boolean getSocial() {
         return social;
     }
 
-    public void setSocial(String social) {
+    public void setSocial(boolean social) {
         this.social = social;
     }
 

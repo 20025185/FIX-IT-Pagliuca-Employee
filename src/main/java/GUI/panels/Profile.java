@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-public class ProfilePanel extends JPanel {
+public class Profile extends JPanel {
     private JLabel uidLabel;
     private JLabel emailLabel;
     private JLabel tokenLabel;
