@@ -13,31 +13,49 @@ import java.util.Vector;
 import java.util.concurrent.*;
 
 public class Board extends JFrame implements KeyListener {
+    //  I record del DB smistati nei vettori, per poi venire distribuiti nei panels rispettivi
     private final Vector<String> pendingReportIDs = new Vector<>();
     private final Vector<String> openReportIDs = new Vector<>();
     private final Vector<String> closedReportIDs = new Vector<>();
+
+    //  Instanza delle chat con gli impiegati aperte
     private final Vector<ChatBidirectional> chatInstances = new Vector<>();
 
-    private final OpenReports openReportPanel = new OpenReports();
-    private final PendingReports pendingReportPanel;
 
-    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private final DatabaseReference databaseReference = firebaseDatabase.getReference("reports");
+    private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private static final DatabaseReference databaseReference = firebaseDatabase.getReference("reports");
+
+    private final static OpenReports openReportPanel = new OpenReports();
+    private final static PendingReports pendingReportPanel = new PendingReports(databaseReference);
+    private final static ClosedReports closedReportPanel = new ClosedReports() ;
+    private final static StreamingStatsReviews streamingStatsReviewsPanel = new StreamingStatsReviews();
+    private final static StatsReports statsReportsPanel = new StatsReports();
+    private final static CreateReport createReportPanel = new CreateReport();
+
+    //  Semaforo per la distribuzione dei record nei vari panels
     private final Semaphore semaphore = new Semaphore(0);
 
     private int cardShowed;
 
     public Board(Employee loggedEmployee) {
-
         requestFocus(true);
         addKeyListener(this);
         Utils utils = new Utils();
 
-        pendingReportPanel = new PendingReports(databaseReference);
+        Profile profile = new Profile();
+        profile.loadProfilePanel(loggedEmployee);
+        profile.setLocationAndSize();
+
         pendingReportPanel.loadPendingReportsPanel(pendingReportIDs);
+        streamingStatsReviewsPanel.loadStatsRecensioniStream();
+        statsReportsPanel.loadStatsEmployee();
+        openReportPanel.loadOpenReportsPanel(openReportIDs, chatInstances, loggedEmployee);
+        closedReportPanel.loadClosedReportsPanel(closedReportIDs);
+
+        createReportPanel.setEmployee(loggedEmployee);
+        createReportPanel.loadCreateReportPanel();
 
         Runnable dynamicPanels = () -> {
-
             if (cardShowed == 1) {
                 utils.retrieveReportsIDs(
                         pendingReportIDs,
@@ -58,6 +76,16 @@ public class Board extends JFrame implements KeyListener {
                         chatInstances,
                         this);
                 openReportPanel.updateOpenReportsPanel(openReportIDs, chatInstances);
+            } else if (cardShowed == 3) {
+                utils.retrieveReportsIDs(
+                        pendingReportIDs,
+                        openReportIDs,
+                        closedReportIDs,
+                        databaseReference,
+                        semaphore,
+                        chatInstances,
+                        this);
+                closedReportPanel.updateClosedReportsPanel(closedReportIDs);
             } else if (cardShowed == 4) {
                 //
             } else if (cardShowed == 5) {
@@ -69,29 +97,14 @@ public class Board extends JFrame implements KeyListener {
         };
 
         ScheduledExecutorService dynamicPanelsExecutor = Executors.newSingleThreadScheduledExecutor();
-        dynamicPanelsExecutor.scheduleAtFixedRate(dynamicPanels, 0, 600, TimeUnit.MILLISECONDS);
-
-        Profile profile = new Profile();
-        profile.loadProfilePanel(loggedEmployee);
-        profile.setLocationAndSize();
-
-        StreamingStatsReviews streamingStatsReviews = new StreamingStatsReviews();
-        streamingStatsReviews.loadStatsRecensioniStream();
-
-        StatsReports statsReports = new StatsReports();
-        statsReports.loadStatsEmployee();
-
-        openReportPanel.loadOpenReportsPanel(openReportIDs, chatInstances, loggedEmployee);
-
-        CreateReport createReportPanel = new CreateReport(loggedEmployee);
-        createReportPanel.loadCreateReportPanel();
-
-        ClosedReports closedReportPanel = new ClosedReports();
-        closedReportPanel.loadClosedReportPanel();
+        dynamicPanelsExecutor.scheduleAtFixedRate(
+                dynamicPanels,
+                0,
+                800,
+                TimeUnit.MILLISECONDS);
 
         CardLayout cardLayout = new CardLayout();
         Container container = getContentPane();
-
         utils.initMenu(cardLayout, container, this);
         utils.initialize(this);
         utils.setLayoutManager(container,
@@ -100,11 +113,10 @@ public class Board extends JFrame implements KeyListener {
                 pendingReportPanel,
                 openReportPanel,
                 closedReportPanel,
-                streamingStatsReviews,
-                statsReports,
+                streamingStatsReviewsPanel,
+                statsReportsPanel,
                 createReportPanel,
                 this);
-
     }
 
     public void setCardShowed(int val) {
@@ -119,7 +131,7 @@ public class Board extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        //  Just for Debug
+
         if (key == KeyEvent.VK_F5) {
             try {
                 semaphore.acquire();

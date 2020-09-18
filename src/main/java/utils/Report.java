@@ -10,9 +10,18 @@ public class Report {
     private String description;
     private String type;
     private String rating;
+    private String dataChiusura;
     private String priority = "-1";
     private String status = "undefined";
     private boolean social;
+
+    public void setDataChiusura(String dataChiusura) {
+        this.dataChiusura = dataChiusura;
+    }
+
+    public String getDataChiusura() {
+        return dataChiusura;
+    }
 
     @Override
     public String toString() {
@@ -27,7 +36,7 @@ public class Report {
                 ", position='" + position + '\'' +
                 ", priority='" + priority + '\'' +
                 ", status='" + status + '\'' +
-                ", social='" + social + '\'' +
+                ", social='" + Boolean.toString(social) + '\'' +
                 '}';
     }
 

@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.concurrent.CountDownLatch;
 
 public class LoginWindow extends JFrame implements ActionListener {
     private final Container container = getContentPane();
@@ -19,7 +20,6 @@ public class LoginWindow extends JFrame implements ActionListener {
     private final JTextField emailField = new JTextField();
     private final JPasswordField passwordField = new JPasswordField();
     private final JButton loginButton = new JButton("LOGIN");
-
     private boolean isEmployee = false;
     private Employee employee;
 
@@ -32,12 +32,33 @@ public class LoginWindow extends JFrame implements ActionListener {
     }
 
     private void initialize() {
-        this.setTitle("[FIX-IT] - LOGIN EMPLOYEE");
+        this.setTitle("FIX IT - LOGIN");
         this.setSize(300, 200);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        emailField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                final int key = e.getKeyCode();
+
+                if (key == KeyEvent.VK_ENTER) {
+                    login();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
 
         passwordField.addKeyListener(new KeyListener() {
             @Override
@@ -62,38 +83,58 @@ public class LoginWindow extends JFrame implements ActionListener {
     }
 
     public void login() {
-        final String email = getEmail();
-        final String psw = getPsw();
-
+        final String email = "pagliuca.manuel@gmail.com";// getEmail();
+        final String psw = "pirletto22";// getPsw();
         FirebaseAPI firebaseAPI = new FirebaseAPI();
 
-        try {
-            employee = firebaseAPI.auth(email, psw);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-
-        if (!employee.getUID().isEmpty()) {
-            DatabaseReference dbr = com.google.firebase.database.FirebaseDatabase.getInstance().getReference("employee");
-            dbr.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child(employee.getUID()).exists()) {
-                        isEmployee = true;
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                }
-            });
-
-            if (isEmployee) {
-                Board board = new Board(employee);
-                this.dispose();
+        if (!email.isEmpty() && !psw.isEmpty()) {
+            try {
+                employee = firebaseAPI.signInWithPassword(email, psw);
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
 
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+
+            if (!employee.getUID().isEmpty()) {
+                DatabaseReference dbr = FirebaseDatabase
+                        .getInstance()
+                        .getReference("employee");
+
+                dbr.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        isEmployee = dataSnapshot
+                                .child(employee.getUID())
+                                .getValue() != null;
+                        countDownLatch.countDown();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (isEmployee) {
+                    new Board(employee);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Non sono state inserite le credenziali corrette.",
+                            "Credenziali non valide",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
+
     }
 
     public void setLayoutManager() {

@@ -36,7 +36,7 @@ public class Consumer {
         thread.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Caught shutdown hook.");
+            //logger.info("Caught shutdown hook.");
 
             myConsumerRunnable.shutdown();
 
@@ -46,7 +46,7 @@ public class Consumer {
                 e.printStackTrace();
             }
 
-            logger.info("Application has exited");
+            //logger.info("Application has exited");
         }));
 
     }
@@ -87,13 +87,13 @@ public class Consumer {
         @Override
         public void run() {
             try {
+                //noinspection InfiniteLoopStatement
                 while (true) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 
                     for (ConsumerRecord<String, String> record : records) {
                         logger.info("Key: " + record.key() + ", Value: " + record.value());
                         logger.info("Partition; " + record.partition() + ", Offset: " + record.offset());
-
                         recordKeysAndValues.put(record.key(), record.value());
                     }
                 }

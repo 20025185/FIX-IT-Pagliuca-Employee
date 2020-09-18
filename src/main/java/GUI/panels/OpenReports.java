@@ -22,8 +22,10 @@ public class OpenReports extends JPanel {
     private static JList<String> jListOpenReports;
     private static Report singleOpenReport;
 
-    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private final DatabaseReference databaseReference = firebaseDatabase.getReference("reports");
+    private final FirebaseDatabase firebaseDatabase =
+            FirebaseDatabase.getInstance();
+    private final DatabaseReference databaseReference =
+            firebaseDatabase.getReference("reports");
 
     private final ButtonGroup statusButtons = new ButtonGroup();
     private final JRadioButton pendingRadioBtn = new JRadioButton("Pending");
@@ -33,6 +35,10 @@ public class OpenReports extends JPanel {
     private Employee employee;
     private int lastSelectedIndex;
     private int lastIndexPriorityColour;
+
+    public OpenReports() {
+
+    }
 
     public void updateOpenReportsPanel(Vector<String> new_openReports,
                                        Vector<ChatBidirectional> chatInstances) {
@@ -62,7 +68,6 @@ public class OpenReports extends JPanel {
         openSplitPane.setLeftComponent(jListOpenReports);
         openSplitPane.setDividerLocation(180);
 
-
         this.revalidate();
         this.repaint();
 
@@ -70,9 +75,11 @@ public class OpenReports extends JPanel {
     }
 
     public void loadOpenReportsPanel(Vector<String> openReportIDs,
-                                     Vector<ChatBidirectional> chatInstances, Employee employee) {
+                                     Vector<ChatBidirectional> chatInstances,
+                                     Employee employee) {
         this.employee = employee;
         jListOpenReports = new JList<>(openReportIDs);
+
         jListOpenReports.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         statusButtons.add(pendingRadioBtn);
@@ -80,10 +87,16 @@ public class OpenReports extends JPanel {
 
         openReportTitle.setSize(20, 20);
         openReportTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-
         rightComponentPane.setLayout(new BoxLayout(rightComponentPane, BoxLayout.Y_AXIS));
 
+        mySelection(openReportIDs, chatInstances, employee);
+        setSplitPane();
+
+        this.setPreferredSize(new Dimension(800, 600));
+        this.add(openSplitPane);
+    }
+
+    public void setSplitPane() {
         JScrollPane jScrollPane = new JScrollPane(jListOpenReports);
         openSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         openSplitPane.setContinuousLayout(false);
@@ -92,21 +105,21 @@ public class OpenReports extends JPanel {
         openSplitPane.setPreferredSize(new Dimension(750, 520));
         openSplitPane.setDividerLocation(180);
         openSplitPane.setOneTouchExpandable(true);
-
-        this.setPreferredSize(new Dimension(800, 600));
-        this.add(openSplitPane);
     }
 
     public void mySelection(Vector<String> openReportIDs,
-                            Vector<ChatBidirectional> chatInstances, Employee employee) {
+                            Vector<ChatBidirectional> chatInstances,
+                            Employee employee) {
+
         jListOpenReports.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+
                 final String reportId = jListOpenReports.getSelectedValue();
 
-                if (e.getClickCount() == 1) {
-                    Semaphore semaphore = new Semaphore(0);
+                if (e.getClickCount() == 1 && reportId != null) {
 
+                    Semaphore semaphore = new Semaphore(1);
                     openReportlabelInfo.setText("");
                     rightComponentPane.remove(openReportlabelInfo);
                     rightComponentPane.remove(pendingRadioBtn);
@@ -119,19 +132,35 @@ public class OpenReports extends JPanel {
                     databaseReference.child(reportId).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            String priority = dataSnapshot.child("priority").getValue().toString();
-                            String object = dataSnapshot.child("object").getValue().toString();
-                            String date = dataSnapshot.child("date").getValue().toString();
-                            String time = dataSnapshot.child("time").getValue().toString();
-                            String uid = dataSnapshot.child("uid").getValue().toString();
-                            String type = dataSnapshot.child("type").getValue().toString();
-                            String description = dataSnapshot.child("description").getValue().toString();
-                            String position = dataSnapshot.child("position").getValue().toString();
-                            String status = dataSnapshot.child("status").getValue().toString().split("_")[0];
-                            String social = dataSnapshot.child("social").getValue().toString();
+                            try {
+                                semaphore.acquire();
+                            } catch (InterruptedException interruptedException) {
+                                interruptedException.printStackTrace();
+                            }
 
-                            singleOpenReport = new Report(reportId, uid, object, description,
-                                    date, time, type, position, priority, "Aperta_" + reportId, Boolean.parseBoolean(social));
+                            final String priority = dataSnapshot.child("priority").getValue().toString();
+                            final String object = dataSnapshot.child("object").getValue().toString();
+                            final String date = dataSnapshot.child("date").getValue().toString();
+                            final String time = dataSnapshot.child("time").getValue().toString();
+                            final String uid = dataSnapshot.child("uid").getValue().toString();
+                            final String type = dataSnapshot.child("type").getValue().toString();
+                            final String description = dataSnapshot.child("description").getValue().toString();
+                            final String position = dataSnapshot.child("position").getValue().toString();
+                            final String status = dataSnapshot.child("status").getValue().toString().split("_")[0];
+                            final String social = dataSnapshot.child("social").getValue().toString();
+
+                            singleOpenReport = new Report(
+                                    reportId,
+                                    uid,
+                                    object,
+                                    description,
+                                    date,
+                                    time,
+                                    type,
+                                    position,
+                                    priority,
+                                    "Aperta_" + reportId,
+                                    Boolean.parseBoolean(social));
 
                             switch (priority) {
                                 case "0":
@@ -183,26 +212,31 @@ public class OpenReports extends JPanel {
                     rightComponentPane.add(closedRadioBtn);
 
                     submitStatusBtn.addActionListener(e1 -> {
-
                         if (pendingRadioBtn.isSelected()) {
                             singleOpenReport.setStatus("Pending_" + singleOpenReport.getUid());
-                            openReportIDs.remove(singleOpenReport.getId());
-                            //jListOpenReports.remove(lastSelectedIndex);
-                            databaseReference.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
+                            databaseReference
+                                    .child(singleOpenReport.getId())
+                                    .child("status")
+                                    .setValueAsync(singleOpenReport.getStatus());
                         } else if (closedRadioBtn.isSelected()) {
-                            singleOpenReport.setStatus("Chiusa_" + singleOpenReport.getUid());
-                            openReportIDs.remove(singleOpenReport.getId());
-                            databaseReference.child(singleOpenReport.getId()).child("status").setValueAsync(singleOpenReport.getStatus());
-
-                            //jListOpenReports.remove(lastSelectedIndex);
-
                             SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss");
                             Date date = new Date(System.currentTimeMillis());
                             String dateFormatted = formatter.format(date);
-                            databaseReference.child(singleOpenReport.getId()).child("data_chiusura").setValueAsync(dateFormatted);
 
+                            singleOpenReport.setDataChiusura(dateFormatted);
+                            singleOpenReport.setStatus("Chiusa_" + singleOpenReport.getUid());
+                            databaseReference
+                                    .child(singleOpenReport.getId())
+                                    .child("status")
+                                    .setValueAsync(singleOpenReport.getStatus());
+                            databaseReference
+                                    .child(singleOpenReport.getId())
+                                    .child("data_chiusura")
+                                    .setValueAsync(singleOpenReport.getDataChiusura());
                         }
+                        openReportIDs.remove(singleOpenReport.getId());
 
+                        //  Clear the right panel
                         openReportlabelInfo.setText("");
                         rightComponentPane.remove(openReportlabelInfo);
                         rightComponentPane.remove(pendingRadioBtn);
@@ -210,9 +244,10 @@ public class OpenReports extends JPanel {
                         rightComponentPane.remove(submitStatusBtn);
                         rightComponentPane.revalidate();
                         rightComponentPane.repaint();
-
                     });
+
                     rightComponentPane.add(submitStatusBtn);
+                    semaphore.release();
                 }
 
                 if (e.getClickCount() == 2) {

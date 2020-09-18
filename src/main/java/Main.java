@@ -11,12 +11,12 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        LoginWindow loginWindow = new LoginWindow();
+        new LoginWindow();
         initializeFirebase();
 
         //  testing
-        Employee employee = new Employee("asdfdas@test.it", "PGLMNKL", "Manuel", "Pagliuca");
-        Board board = new Board(employee);
+        //Employee employee = new Employee("asdfdas@test.it", "PGLMNKL", "Manuel", "Pagliuca");
+        //Board board = new Board(employee);
     }
 
     public static void initializeFirebase() throws IOException {

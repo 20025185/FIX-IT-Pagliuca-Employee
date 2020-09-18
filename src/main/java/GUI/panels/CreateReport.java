@@ -5,7 +5,6 @@ import utils.Employee;
 import utils.Report;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -45,11 +44,7 @@ public class CreateReport extends JPanel {
             .getInstance()
             .getReference("reports");
 
-    private final Employee loggedEmploye;
-
-    public CreateReport(Employee loggedEmployee) {
-        this.loggedEmploye = loggedEmployee;
-    }
+    private Employee loggedEmploye;
 
     public void loadCreateReportPanel() {
         loadItems();
@@ -65,8 +60,8 @@ public class CreateReport extends JPanel {
                         time,
                         Objects.requireNonNull(issuesBox.getSelectedItem()).toString(),
                         coordReport.getText().replace(",", " "),
-                        getSelectedPriority(),
-                        Objects.requireNonNull(statusBox.getSelectedItem()).toString(),
+                        parsePriority(Objects.requireNonNull(getSelectedPriority())),
+                        Objects.requireNonNull(statusBox.getSelectedItem()).toString() + "_" + loggedEmploye.getUID(),
                         socialReport.getState()
                 );
                 databaseReference.child(repId).setValueAsync(report);
@@ -85,6 +80,18 @@ public class CreateReport extends JPanel {
             socialReport.setState(false);
             sendBtn.setEnabled(true);
         });
+    }
+
+    private String parsePriority(String selectedPriority) {
+        switch (selectedPriority) {
+            case "Alta":
+                return "2";
+            case "Media":
+                return "1";
+            case "Bassa":
+                return "0";
+        }
+        return selectedPriority;
     }
 
     private String getSelectedPriority() {
@@ -245,5 +252,9 @@ public class CreateReport extends JPanel {
         resetBtn.setBounds(390, 460, 300, 50);
         this.add(sendBtn);
         this.add(resetBtn);
+    }
+
+    public void setEmployee(Employee loggedEmployee) {
+        this.loggedEmploye = loggedEmployee;
     }
 }

@@ -6,7 +6,10 @@ import utils.Report;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
+import java.util.concurrent.Semaphore;
 
 public class PendingReports extends JPanel {
     private final DatabaseReference databaseReference;
@@ -66,6 +69,7 @@ public class PendingReports extends JPanel {
 
         mySelection();
 
+
         JScrollPane jScrollPane = new JScrollPane(stringJList);
         pendingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         pendingSplitPane.setContinuousLayout(false);
@@ -87,7 +91,8 @@ public class PendingReports extends JPanel {
                 pendingReportIDs.remove(singlePendingReport.getId());
             }
 
-            requestFocus(true);
+            pendingRightPane.removeAll();
+            labelReportInfo.setText("");
             this.removeAll();
             this.add(pendingSplitPane);
             this.revalidate();
@@ -98,7 +103,6 @@ public class PendingReports extends JPanel {
             databaseReference.child(singlePendingReport.getId()).child("status").setValueAsync("Aperta_" + singlePendingReport.getUid());
             pendingReportIDs.remove(singlePendingReport.getId());
 
-            requestFocus(true);
             this.removeAll();
             this.add(pendingSplitPane);
             this.revalidate();
@@ -107,68 +111,109 @@ public class PendingReports extends JPanel {
     }
 
     public void mySelection() {
-        stringJList.addListSelectionListener(e1 -> {
-            final DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("reports").child(stringJList.getSelectedValue());
 
-            dbr.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    String priority = dataSnapshot.child("priority").getValue().toString();
-                    String object = dataSnapshot.child("object").getValue().toString();
-                    String date = dataSnapshot.child("date").getValue().toString();
-                    String time = dataSnapshot.child("time").getValue().toString();
-                    String uid = dataSnapshot.child("uid").getValue().toString();
-                    String type = dataSnapshot.child("type").getValue().toString();
-                    String description = dataSnapshot.child("description").getValue().toString();
-                    String position = dataSnapshot.child("position").getValue().toString();
-                    String status = dataSnapshot.child("status").getValue().toString();
-                    String social = dataSnapshot.child("social").getValue().toString();
-                    String id = stringJList.getSelectedValue();
+        stringJList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
 
-                    singlePendingReport = new Report(id, uid, object, description, date, time, type, position, priority, status, Boolean.parseBoolean(social));
+                if (stringJList.getSelectedValue() != null) {
+                    final String reportID = stringJList.getSelectedValue();
+                    final DatabaseReference dbr =
+                            FirebaseDatabase
+                                    .getInstance()
+                                    .getReference("reports")
+                                    .child(stringJList.getSelectedValue());
+                    Semaphore semaphore = new Semaphore(1);
 
-                    switch (priority) {
-                        case "0":
-                            stringJList.setSelectionBackground(Color.GREEN);
-                            lastIndexPriorityColour = 0;
-                            break;
-                        case "1":
-                            stringJList.setSelectionBackground(Color.YELLOW);
-                            lastIndexPriorityColour = 1;
-                            break;
-                        case "2":
-                            stringJList.setSelectionBackground(Color.RED);
-                            lastIndexPriorityColour = 2;
-                            break;
-                        default:
-                            stringJList.setSelectionBackground(Color.GRAY);
-                            break;
+                    dbr.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            try {
+                                semaphore.acquire(1);
+                            } catch (InterruptedException interruptedException) {
+                                interruptedException.printStackTrace();
+                            }
+
+                            final String priority = dataSnapshot.child("priority").getValue().toString();
+                            final String object = dataSnapshot.child("object").getValue().toString();
+                            final String date = dataSnapshot.child("date").getValue().toString();
+                            final String time = dataSnapshot.child("time").getValue().toString();
+                            final String uid = dataSnapshot.child("uid").getValue().toString();
+                            final String type = dataSnapshot.child("type").getValue().toString();
+                            final String description = dataSnapshot.child("description").getValue().toString();
+                            final String position = dataSnapshot.child("position").getValue().toString();
+                            final String status = dataSnapshot.child("status").getValue().toString();
+                            final String social = dataSnapshot.child("social").getValue().toString();
+
+                            singlePendingReport = new Report(
+                                    reportID,
+                                    uid,
+                                    object,
+                                    description,
+                                    date,
+                                    time,
+                                    type,
+                                    position,
+                                    priority,
+                                    status,
+                                    Boolean.parseBoolean(social));
+
+                            switch (priority) {
+                                case "0":
+                                    stringJList.setSelectionBackground(Color.GREEN);
+                                    lastIndexPriorityColour = 0;
+                                    break;
+                                case "1":
+                                    stringJList.setSelectionBackground(Color.YELLOW);
+                                    lastIndexPriorityColour = 1;
+                                    break;
+                                case "2":
+                                    stringJList.setSelectionBackground(Color.RED);
+                                    lastIndexPriorityColour = 2;
+                                    break;
+                                default:
+                                    stringJList.setSelectionBackground(Color.GRAY);
+                                    break;
+                            }
+
+                            labelReportInfo.setText("<html>" +
+                                    "Oggetto : " + object + "<br><br>" +
+                                    "Data : " + date + "<br><br>" +
+                                    "Ora : " + time + "<br><br>" +
+                                    "UID : " + uid + "<br><br>" +
+                                    "Tipologia : " + type + "<br><br>" +
+                                    "Descrizione : " + description + "<br><br>" +
+                                    "Coordinate : " + position + "<br><br>" +
+                                    "Priorità : " + priority + "<br><br>" +
+                                    "Diffusione su social : " + social + "<br><br>" +
+                                    "Status : Pending <br><br>" + "</html>");
+
+                            pendingRightPane.add(labelReportInfo);
+                            pendingRightPane.add(editBtn);
+                            pendingRightPane.add(openStatusBtn);
+
+                            lastSelectedIndex = stringJList.getSelectedIndex();
+
+                            semaphore.release(1);
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    try {
+                        semaphore.acquire(1);
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+                    } finally {
+                        semaphore.release();
                     }
-
-                    labelReportInfo.setText("<html>" +
-                            "Oggetto : " + object + "<br><br>" +
-                            "Data : " + date + "<br><br>" +
-                            "Ora : " + time + "<br><br>" +
-                            "UID : " + uid + "<br><br>" +
-                            "Tipologia : " + type + "<br><br>" +
-                            "Descrizione : " + description + "<br><br>" +
-                            "Coordinate : " + position + "<br><br>" +
-                            "Priorità : " + priority + "<br><br>" +
-                            "Diffusione su social : " + social + "<br><br>" +
-                            "Status : Pending <br><br>" + "</html>");
-
-                    pendingRightPane.add(labelReportInfo);
-                    pendingRightPane.add(editBtn);
-                    pendingRightPane.add(openStatusBtn);
-
-                    lastSelectedIndex = stringJList.getSelectedIndex();
                 }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            }
         });
     }
 }

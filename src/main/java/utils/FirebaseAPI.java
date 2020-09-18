@@ -1,100 +1,80 @@
 package utils;
 
+import com.google.api.client.json.Json;
+import com.google.firebase.database.utilities.Utilities;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import javax.swing.*;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
 public class FirebaseAPI {
-    private final String BASE_URL = "https://identitytoolkit.googleapis.com/v1/accounts:";
+    private final static String BASE_URL = "https://identitytoolkit.googleapis.com/v1/accounts:";
+    private final static String firebaseKey = "AIzaSyAvOgNrXpFdMpNhi7KgyXq0Bav7WejwRk0";
+    private final static String OPERATION_AUTH = "signInWithPassword";
 
-    private final String firebaseKey;
-    private static FirebaseAPI instance = null;
-
-    public FirebaseAPI() {
-        firebaseKey = "AIzaSyAvOgNrXpFdMpNhi7KgyXq0Bav7WejwRk0";
-    }
-
-    public static FirebaseAPI getInstance() {
-        if (instance == null) {
-            instance = new FirebaseAPI();
+    public Employee signInWithPassword(String username, String password) throws Exception {
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Non sono stante inserite le credenziali.",
+                    "Credenziali non valide",
+                    JOptionPane.ERROR_MESSAGE);
         }
-        return instance;
-    }
 
-    public Employee auth(String username, String password) throws Exception {
+        URL url = null;
+        URLConnection con = null;
         HttpURLConnection urlRequest = null;
 
         Employee employee = new Employee();
 
         try {
-            String OPERATION_AUTH = "signInWithPassword";
-            URL url = new URL(BASE_URL + OPERATION_AUTH + "?key=" + firebaseKey);
-            urlRequest = (HttpURLConnection) url.openConnection();
+            url = new URL(BASE_URL + OPERATION_AUTH + "?key=" + firebaseKey);
+            con = url.openConnection();
+            urlRequest = (HttpURLConnection) con;
+            urlRequest.setRequestMethod("POST");
             urlRequest.setDoOutput(true);
-            urlRequest.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            urlRequest.setRequestProperty("Content-Type", "application/json");
+
             OutputStream os = urlRequest.getOutputStream();
             OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
             osw.write("{\"email\":\"" + username + "\",\"password\":\"" + password + "\",\"returnSecureToken\":true}");
             osw.flush();
             osw.close();
             urlRequest.connect();
-            JsonParser jp = new JsonParser(); //from gson
-            JsonElement root = jp.parse(new InputStreamReader((InputStream) urlRequest.getContent())); //Convert the input stream to a json element
-            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
 
-            employee.setEmail(rootobj.get("email").getAsString());
-            employee.setUID(rootobj.get("localId").getAsString());
-            employee.setTokenID(rootobj.get("idToken").getAsString());
+            JSONObject jsonObject = convertInputStreamToJSONObject((InputStream) urlRequest.getContent());
+
+            employee.setEmail(jsonObject.get("email").toString());
+            employee.setUID(jsonObject.get("localId").toString());
+            employee.setTokenID(jsonObject.get("idToken").toString());
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
-        } finally {
-            assert urlRequest != null;
-            urlRequest.disconnect();
         }
+
         return employee;
     }
 
-    public String getAccountInfo(String token) throws Exception {
-        HttpURLConnection urlRequest = null;
-        String email;
+    private static JSONObject convertInputStreamToJSONObject(InputStream inputStream)
+            throws JSONException, IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = "";
+        StringBuilder result = new StringBuilder();
+        while ((line = bufferedReader.readLine()) != null)
+            result.append(line);
 
-        try {
-            String OPERATION_ACCOUNT_INFO = "lookup";
-            URL url = new URL(BASE_URL + OPERATION_ACCOUNT_INFO + "?key=" + firebaseKey);
-            urlRequest = (HttpURLConnection) url.openConnection();
-            urlRequest.setDoOutput(true);
-            urlRequest.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            OutputStream os = urlRequest.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
-            osw.write("{\"idToken\":\"" + token + "\"}");
-            osw.flush();
-            osw.close();
-            urlRequest.connect();
-
-            JsonParser jp = new JsonParser(); //from gson
-            JsonElement root = jp.parse(new InputStreamReader((InputStream) urlRequest.getContent())); //Convert the input stream to a json element
-            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
-
-            email = rootobj.get("users").getAsJsonArray().get(0).getAsJsonObject().get("email").getAsString();
-
-        } catch (Exception e) {
-            return null;
-        } finally {
-            assert urlRequest != null;
-            urlRequest.disconnect();
-        }
-        return email;
-
+        inputStream.close();
+        return new JSONObject(result.toString());
     }
-
 
 }
