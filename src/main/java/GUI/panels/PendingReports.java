@@ -29,7 +29,7 @@ public class PendingReports extends JPanel {
 
         labelReportInfo.setHorizontalAlignment(SwingConstants.LEFT);
         labelReportInfo.setVerticalAlignment(SwingConstants.TOP);
-        pendingRightPane.setLayout(new BoxLayout(pendingRightPane, BoxLayout.Y_AXIS));
+        pendingRightPane.setLayout(new FlowLayout());
         this.setPreferredSize(new Dimension(800, 600));
 
         handlePendingReportsButtons();
@@ -189,7 +189,10 @@ public class PendingReports extends JPanel {
                                     "Diffusione su social : " + social + "<br><br>" +
                                     "Status : Pending <br><br>" + "</html>");
 
+
                             pendingRightPane.add(labelReportInfo);
+
+
                             pendingRightPane.add(editBtn);
                             pendingRightPane.add(openStatusBtn);
 

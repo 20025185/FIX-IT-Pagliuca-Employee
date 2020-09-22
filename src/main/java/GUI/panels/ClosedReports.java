@@ -53,7 +53,7 @@ public class ClosedReports extends JPanel {
 
         mySelection();
 
-        rightComponentPane.setLayout(new BoxLayout(rightComponentPane, BoxLayout.Y_AXIS));
+        rightComponentPane.setLayout(new FlowLayout());
         splitPane.setRightComponent(rightComponentPane);
         splitPane.setLeftComponent(jListClosedReports);
         splitPane.setDividerLocation(180);

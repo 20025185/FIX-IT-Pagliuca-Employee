@@ -4,6 +4,7 @@ import utils.Employee;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -20,14 +21,22 @@ public class Profile extends JPanel {
     }
 
     private void loadItemsOnPanel() {
-        JLabel employeeInfo = new JLabel("<html>Fullname: " + employee.getFullname() +
-                "<br>" + "Surname: " + employee.getSurname()
-                + "<br> e-Mail: " + employee.getEmail() +
-                "<br> UID: " + employee.getUID() + "</html>");
+        JLabel employeeInfo = new JLabel(
+                   "<html><center><br><br><br><br><br><center><h1><u>Profilo impiegato</u></h1>"    +
+                        "<br>Nome: " + employee.getFullname()  + "" +
+                        "<br>Cognome: "  + employee.getSurname()   + "" +
+                        "<br>Data di nascita: "  + employee.getBirthday()   + "" +
+                        "<br>Codice fiscale: "  + employee.getFiscalCode()   + "" +
+                        "<br>e-mail: "  + employee.getEmail()     + "" +
+                        "<br><u>UID: "  + employee.getUID()    + "</u></center></html>");
+        //employeeInfo.setOpaque(true);
+        Border border = BorderFactory.createLineBorder(Color.PINK, 3);
+        employeeInfo.setBorder(border);
+        //employeeInfo.setBackground(Color.PINK);
         this.setLayout(new BorderLayout());
         employeeInfo.setHorizontalAlignment(JLabel.CENTER);
         employeeInfo.setVerticalAlignment(JLabel.CENTER);
-        this.add(employeeInfo,BorderLayout.CENTER);
+        this.add(employeeInfo, BorderLayout.CENTER);
     }
 
     private void retrieveProfileImg() throws IOException {
@@ -43,7 +52,7 @@ public class Profile extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(profileImg, 280, 0, this);
+        g.drawImage(profileImg, 290, 0, this);
     }
 
     public void setLocationAndSize() {

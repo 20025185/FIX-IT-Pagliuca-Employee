@@ -20,15 +20,13 @@ import java.util.concurrent.TimeUnit;
 
 public class StreamingStatsReviews extends JPanel {
     private HashMap<String, String> stringStringHashMap = new HashMap<>();
-    JFreeChart chart;
-    ChartPanel chartPanel;
-    CategoryPlot plot;
-    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-    int naturalVal = 0, stradaleVal = 0, sospetteVal = 0, altroVal = 0;
+    private JFreeChart chart;
+    private ChartPanel chartPanel;
+    private CategoryPlot plot;
+    private final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    private int naturalVal = 0, stradaleVal = 0, sospetteVal = 0, altroVal = 0;
 
     public void loadStatsRecensioniStream() {
-
         FixItStream favReviewStream = new FixItStream("input-ratings");
         favReviewStream.execute();
 
@@ -45,26 +43,29 @@ public class StreamingStatsReviews extends JPanel {
             parseValueAndKeys(stringStringHashMap);
 
             dataset.setValue(naturalVal,
-                    "",
+                    "Problematica di origine naturale",
                     "Problematica di origine naturale");
             dataset.setValue(stradaleVal,
-                    "",
+                    "Problematica stradale",
                     "Problematica stradale");
             dataset.setValue(sospetteVal,
-                    "",
+                    "Attività sospette",
                     "Attività sospette");
             dataset.setValue(altroVal,
-                    "",
+                    "Altro",
                     "Altro");
 
             chart = ChartFactory.createBarChart(
-                    "Statistiche Recensioni Favorevoli ( rating >= 4.0 )",
+                    "Statistiche in tempo reale delle recensioni favorevoli (rating >= 4.0)",
                     "Tipologia delle segnalazioni",
                     "Numero di segnalazioni",
                     dataset);
 
             plot = chart.getCategoryPlot();
-            plot.setRangeGridlinePaint(Color.BLACK);
+            plot.getRenderer().setSeriesPaint(1, Color.red);
+            plot.getRenderer().setSeriesPaint(2, Color.yellow);
+            plot.getRenderer().setSeriesPaint(3, Color.green);
+            //plot.setRangeGridlinePaint(Color.WHITE);
             chartPanel = new ChartPanel(chart);
 
             this.removeAll();
@@ -109,7 +110,7 @@ public class StreamingStatsReviews extends JPanel {
                 dataset);
 
         plot = chart.getCategoryPlot();
-        plot.setRangeGridlinePaint(Color.BLACK);
+        plot.setRangeGridlinePaint(Color.WHITE);
 
         chartPanel = new ChartPanel(chart);
         chartPanel.setSize(500, 400);

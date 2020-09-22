@@ -62,7 +62,7 @@ public class OpenReports extends JPanel {
         this.remove(openSplitPane.getLeftComponent());
         this.remove(rightComponentPane);
 
-        rightComponentPane.setLayout(new BoxLayout(rightComponentPane, BoxLayout.Y_AXIS));
+        rightComponentPane.setLayout(new FlowLayout());
 
         openSplitPane.setRightComponent(rightComponentPane);
         openSplitPane.setLeftComponent(jListOpenReports);

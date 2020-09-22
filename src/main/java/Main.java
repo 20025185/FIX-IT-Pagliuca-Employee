@@ -20,7 +20,7 @@ public class Main {
     public static void initializeFirebase() throws IOException {
         FileInputStream serviceAccount = new FileInputStream("pagliu-db-firebase-adminsdk-ml5ap-f0eb21cf94.json");
 
-        FirebaseOptions options = new FirebaseOptions.Builder()
+        @SuppressWarnings("deprecation") FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setDatabaseUrl("https://pagliu-db.firebaseio.com")
                 .build();

@@ -93,8 +93,8 @@ public class LoginWindow extends JFrame implements ActionListener {
     }
 
     public void login() throws IOException {
-        final String email = "pagliuca.manuel@gmail.com";// getEmail();
-        final String psw = "pirletto22";// getPsw();
+        final String email = getEmail();
+        final String psw = getPsw();
         FirebaseAPI firebaseAPI = new FirebaseAPI();
 
         if (!email.isEmpty() && !psw.isEmpty()) {
