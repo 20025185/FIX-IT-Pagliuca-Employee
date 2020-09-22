@@ -1,6 +1,6 @@
 package GUI.others;
 
-import GUI.Board;
+import GUI.ControlPanel;
 import GUI.dialogs.ChatBidirectional;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -15,7 +15,7 @@ import java.util.concurrent.Semaphore;
 
 public class Utils {
 
-    public void initMenu(CardLayout cardLayout, Container container, Board board) {
+    public void initMenu(CardLayout cardLayout, Container container, ControlPanel controlPanel) {
         JMenuBar jMenuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         JMenu reportMenu = new JMenu("Segnalazioni");
@@ -24,7 +24,7 @@ public class Utils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "0");
-                board.setCardShowed(0);
+                controlPanel.setCardShowed(0);
             }
         });
 
@@ -32,7 +32,7 @@ public class Utils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "1");
-                board.setCardShowed(1);
+                controlPanel.setCardShowed(1);
             }
         });
 
@@ -40,7 +40,7 @@ public class Utils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "2");
-                board.setCardShowed(2);
+                controlPanel.setCardShowed(2);
             }
         });
 
@@ -48,7 +48,7 @@ public class Utils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "3");
-                board.setCardShowed(3);
+                controlPanel.setCardShowed(3);
             }
         });
 
@@ -58,7 +58,7 @@ public class Utils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "4");
-                board.setCardShowed(4);
+                controlPanel.setCardShowed(4);
             }
         });
 
@@ -66,7 +66,7 @@ public class Utils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "5");
-                board.setCardShowed(5);
+                controlPanel.setCardShowed(5);
             }
         });
 
@@ -74,14 +74,14 @@ public class Utils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(container, "6");
-                board.setCardShowed(6);
+                controlPanel.setCardShowed(6);
             }
         });
 
         JMenuItem exitItem = new JMenuItem(new AbstractAction("Esci") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                board.dispose();
+                controlPanel.dispose();
                 System.exit(1);
             }
         });
@@ -101,17 +101,17 @@ public class Utils {
         jMenuBar.add(fileMenu);
         jMenuBar.add(reportMenu);
 
-        board.setJMenuBar(jMenuBar);
+        controlPanel.setJMenuBar(jMenuBar);
 
     }
 
-    public void initialize(Board board) {
-        board.setTitle("[FIX-IT] - DASHBOARD");
-        board.setSize(800, 600);
-        board.setLocationRelativeTo(null);
-        board.setVisible(true);
-        board.setResizable(false);
-        board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public void initialize(ControlPanel controlPanel) {
+        controlPanel.setTitle("CONTROL PANEL v0.0.2");
+        controlPanel.setSize(800, 600);
+        controlPanel.setLocationRelativeTo(null);
+        controlPanel.setVisible(true);
+        controlPanel.setResizable(false);
+        controlPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void retrieveReportsIDs(Vector<String> pendingReportIDs,
@@ -120,7 +120,7 @@ public class Utils {
                                    DatabaseReference databaseReference,
                                    Semaphore semaphore,
                                    Vector<ChatBidirectional> chatInstances,
-                                   Board board) {
+                                   ControlPanel controlPanel) {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -151,7 +151,7 @@ public class Utils {
                 semaphore.release();
 
                 if (chatInstances.isEmpty()) {
-                    board.requestFocus();
+                    controlPanel.requestFocus();
                 }
             }
 
@@ -186,7 +186,7 @@ public class Utils {
                                  JPanel statsReviewsPanel,
                                  JPanel statsReportsPanel,
                                  JPanel createReportPanel,
-                                 Board board) {
+                                 ControlPanel controlPanel) {
         container.setLayout(cardLayout);
         container.add(profilePanel, "0");
         container.add(pendingReportPanel, "1");
@@ -196,7 +196,7 @@ public class Utils {
         container.add(statsReportsPanel, "5");
         container.add(createReportPanel, "6");
         cardLayout.show(container, "0");
-        board.setCardShowed(0);
+        controlPanel.setCardShowed(0);
     }
 
 }

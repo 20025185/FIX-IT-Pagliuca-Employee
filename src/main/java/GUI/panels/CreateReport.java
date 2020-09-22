@@ -165,7 +165,7 @@ public class CreateReport extends JPanel {
             if (!oggettoReport.getText().isEmpty()) {
                 if (!descReport.getText().isEmpty()) {
                     if (!coordReport.getText().isEmpty() &&
-                            coordReport.getText().matches("[- 0-9*]*,[-0-9*]*")) {
+                            coordReport.getText().matches("[- 0-9*.0-9*]*,[- 0-9*.0-9*]*")) {
                         if (getSelectedPriority() != null) {
                             return true;
                         } else {

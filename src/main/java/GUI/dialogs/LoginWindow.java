@@ -1,6 +1,6 @@
 package GUI.dialogs;
 
-import GUI.Board;
+import GUI.ControlPanel;
 import com.google.firebase.database.*;
 import utils.Employee;
 import utils.FirebaseAPI;
@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 public class LoginWindow extends JFrame implements ActionListener {
@@ -32,8 +33,9 @@ public class LoginWindow extends JFrame implements ActionListener {
     }
 
     private void initialize() {
-        this.setTitle("FIX IT - LOGIN");
-        this.setSize(300, 200);
+        this.setTitle("LOGIN");
+        this.setIconImage(new ImageIcon("src\\lemon-icon.png").getImage());
+        this.setSize(300, 180);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
         this.setResizable(false);
@@ -50,7 +52,11 @@ public class LoginWindow extends JFrame implements ActionListener {
                 final int key = e.getKeyCode();
 
                 if (key == KeyEvent.VK_ENTER) {
-                    login();
+                    try {
+                        login();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
                 }
             }
 
@@ -71,7 +77,11 @@ public class LoginWindow extends JFrame implements ActionListener {
                 final int key = e.getKeyCode();
 
                 if (key == KeyEvent.VK_ENTER) {
-                    login();
+                    try {
+                        login();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
                 }
             }
 
@@ -82,7 +92,7 @@ public class LoginWindow extends JFrame implements ActionListener {
         });
     }
 
-    public void login() {
+    public void login() throws IOException {
         final String email = "pagliuca.manuel@gmail.com";// getEmail();
         final String psw = "pirletto22";// getPsw();
         FirebaseAPI firebaseAPI = new FirebaseAPI();
@@ -123,7 +133,7 @@ public class LoginWindow extends JFrame implements ActionListener {
                 }
 
                 if (isEmployee) {
-                    new Board(employee);
+                    new ControlPanel(employee);
                     this.dispose();
                 } else {
                     JOptionPane.showMessageDialog(
@@ -164,7 +174,11 @@ public class LoginWindow extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginButton) {
-            login();
+            try {
+                login();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
     }
 

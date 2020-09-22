@@ -1,6 +1,7 @@
 package utils;
 
 import com.google.api.client.json.Json;
+import com.google.firebase.database.*;
 import com.google.firebase.database.utilities.Utilities;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -61,6 +62,28 @@ public class FirebaseAPI {
             e.printStackTrace();
             return null;
         }
+
+        return retrieveOtherInfo(employee);
+    }
+
+    private Employee retrieveOtherInfo(Employee employee) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("employee");
+
+        databaseReference.child(employee.getUID()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                employee.setFiscalCode(dataSnapshot.child("fiscalCode").getValue().toString());
+                employee.setFullname(dataSnapshot.child("fullname").getValue().toString());
+                employee.setSurname(dataSnapshot.child("surname").getValue().toString());
+                employee.setImageURL(dataSnapshot.child("imageURL").getValue().toString());
+                employee.setBirthday(dataSnapshot.child("birthday").getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         return employee;
     }

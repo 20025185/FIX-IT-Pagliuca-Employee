@@ -9,10 +9,11 @@ import utils.Employee;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.Vector;
 import java.util.concurrent.*;
 
-public class Board extends JFrame implements KeyListener {
+public class ControlPanel extends JFrame implements KeyListener {
     //  I record del DB smistati nei vettori, per poi venire distribuiti nei panels rispettivi
     private final Vector<String> pendingReportIDs = new Vector<>();
     private final Vector<String> openReportIDs = new Vector<>();
@@ -20,7 +21,6 @@ public class Board extends JFrame implements KeyListener {
 
     //  Instanza delle chat con gli impiegati aperte
     private final Vector<ChatBidirectional> chatInstances = new Vector<>();
-
 
     private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private static final DatabaseReference databaseReference = firebaseDatabase.getReference("reports");
@@ -34,10 +34,11 @@ public class Board extends JFrame implements KeyListener {
 
     //  Semaforo per la distribuzione dei record nei vari panels
     private final Semaphore semaphore = new Semaphore(0);
-
     private int cardShowed;
 
-    public Board(Employee loggedEmployee) {
+    public ControlPanel(Employee loggedEmployee) throws IOException {
+        ImageIcon favicon = new ImageIcon("src\\icon.png");
+        this.setIconImage(favicon.getImage());
         requestFocus(true);
         addKeyListener(this);
         Utils utils = new Utils();
