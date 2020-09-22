@@ -8,12 +8,10 @@ import org.jfree.chart.labels.PieSectionLabelGenerator;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -112,11 +110,7 @@ public class StatsReports extends JPanel {
         ((PiePlot) chart.getPlot()).setLabelGenerator(labelGenerator);
 
         chartPanel = new ChartPanel(chart);
-        chartPanel.setSize(300, 200);
-        chartPanel.setMaximumSize(new Dimension(300, 200));
-        chartPanel.setPreferredSize(new Dimension(500, 500));
-        chartPanel.setVisible(true);
-        chartPanel.setEnabled(false);
+        chartConfig();
 
         this.repaint();
         this.revalidate();
@@ -140,11 +134,7 @@ public class StatsReports extends JPanel {
 
         chartPanel = new ChartPanel(chart);
 
-        chartPanel.setSize(500, 500);
-        chartPanel.setMaximumSize(new Dimension(500, 500));
-        chartPanel.setPreferredSize(new Dimension(500, 500));
-        chartPanel.setVisible(true);
-        chartPanel.setEnabled(false);
+        chartConfig();
 
         this.repaint();
         this.revalidate();
@@ -225,11 +215,7 @@ public class StatsReports extends JPanel {
         p.setRangeGridlinePaint(Color.BLUE);
 
         chartPanel = new ChartPanel(chart);
-        chartPanel.setSize(300, 200);
-        chartPanel.setMaximumSize(new Dimension(300, 200));
-        chartPanel.setPreferredSize(new Dimension(500, 500));
-        chartPanel.setVisible(true);
-        chartPanel.setEnabled(false);
+        chartConfig();
 
         this.repaint();
         this.revalidate();
@@ -288,11 +274,7 @@ public class StatsReports extends JPanel {
 
         chartPanel = new ChartPanel(chart);
 
-        chartPanel.setSize(300, 200);
-        chartPanel.setMaximumSize(new Dimension(300, 200));
-        chartPanel.setPreferredSize(new Dimension(500, 500));
-        chartPanel.setVisible(true);
-        chartPanel.setEnabled(false);
+        chartConfig();
 
         this.repaint();
         this.revalidate();
@@ -318,11 +300,7 @@ public class StatsReports extends JPanel {
 
         chartPanel = new ChartPanel(chart);
 
-        chartPanel.setSize(300, 200);
-        chartPanel.setMaximumSize(new Dimension(300, 200));
-        chartPanel.setPreferredSize(new Dimension(500, 500));
-        chartPanel.setVisible(true);
-        chartPanel.setEnabled(false);
+        chartConfig();
 
         this.repaint();
         this.revalidate();
