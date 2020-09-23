@@ -1,7 +1,6 @@
 package GUI.dialogs;
 
 import GUI.ControlPanel;
-import com.google.firebase.database.*;
 import utils.Employee;
 import utils.FirebaseAPI;
 
@@ -12,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 
 public class LoginWindow extends JFrame implements ActionListener {
     private final Container container = getContentPane();
@@ -21,7 +19,6 @@ public class LoginWindow extends JFrame implements ActionListener {
     private final JTextField emailField = new JTextField();
     private final JPasswordField passwordField = new JPasswordField();
     private final JButton loginButton = new JButton("LOGIN");
-    private boolean isEmployee = false;
     private Employee employee;
 
     public LoginWindow() {
@@ -104,47 +101,17 @@ public class LoginWindow extends JFrame implements ActionListener {
                 exception.printStackTrace();
             }
 
-            CountDownLatch countDownLatch = new CountDownLatch(1);
-
-            if (!employee.getUID().isEmpty()) {
-                DatabaseReference dbr = FirebaseDatabase
-                        .getInstance()
-                        .getReference("employee");
-
-                dbr.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        isEmployee = dataSnapshot
-                                .child(employee.getUID())
-                                .getValue() != null;
-                        countDownLatch.countDown();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-                try {
-                    countDownLatch.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                if (isEmployee) {
-                    new ControlPanel(employee);
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Non sono state inserite le credenziali corrette.",
-                            "Credenziali non valide",
-                            JOptionPane.ERROR_MESSAGE);
-                }
+            if (employee != null) {
+                new ControlPanel(employee);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Non sono state inserite le credenziali corrette.",
+                        "Credenziali non valide",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
-
     }
 
     public void setLayoutManager() {

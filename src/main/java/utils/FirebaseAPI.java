@@ -1,12 +1,6 @@
 package utils;
 
-import com.google.api.client.json.Json;
 import com.google.firebase.database.*;
-import com.google.firebase.database.utilities.Utilities;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,8 +15,9 @@ public class FirebaseAPI {
     private final static String BASE_URL = "https://identitytoolkit.googleapis.com/v1/accounts:";
     private final static String firebaseKey = "AIzaSyAvOgNrXpFdMpNhi7KgyXq0Bav7WejwRk0";
     private final static String OPERATION_AUTH = "signInWithPassword";
+    boolean isEmployee = false;
 
-    public Employee signInWithPassword(String username, String password) throws Exception {
+    public Employee signInWithPassword(String username, String password) {
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(
                     null,
@@ -31,10 +26,9 @@ public class FirebaseAPI {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        URL url = null;
-        URLConnection con = null;
-        HttpURLConnection urlRequest = null;
-
+        URL url;
+        URLConnection con;
+        HttpURLConnection urlRequest;
         Employee employee = new Employee();
 
         try {
@@ -63,6 +57,7 @@ public class FirebaseAPI {
             return null;
         }
 
+        //  Chiamo la funzione per arrichire i dati dell'impiegato nel caso fosse un impiegato, nel caso contrario restituisco null.
         return retrieveOtherInfo(employee);
     }
 
@@ -72,11 +67,14 @@ public class FirebaseAPI {
         databaseReference.child(employee.getUID()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                employee.setFiscalCode(dataSnapshot.child("fiscalCode").getValue().toString());
-                employee.setFullname(dataSnapshot.child("fullname").getValue().toString());
-                employee.setSurname(dataSnapshot.child("surname").getValue().toString());
-                employee.setImageURL(dataSnapshot.child("imageURL").getValue().toString());
-                employee.setBirthday(dataSnapshot.child("birthday").getValue().toString());
+                if (dataSnapshot.child(employee.getUID()).getValue() != null) {
+                    employee.setFiscalCode(dataSnapshot.child("fiscalCode").getValue().toString());
+                    employee.setFullname(dataSnapshot.child("fullname").getValue().toString());
+                    employee.setSurname(dataSnapshot.child("surname").getValue().toString());
+                    employee.setImageURL(dataSnapshot.child("imageURL").getValue().toString());
+                    employee.setBirthday(dataSnapshot.child("birthday").getValue().toString());
+                    isEmployee = true;
+                }
             }
 
             @Override
@@ -85,13 +83,18 @@ public class FirebaseAPI {
             }
         });
 
-        return employee;
+        //  Controllo se è un impiegato, nella LoginWindow nella riga 107, si mostrerà un dialog in caso contrario.
+        if (isEmployee) {
+            return employee;
+        } else {
+            return null;
+        }
     }
 
     private static JSONObject convertInputStreamToJSONObject(InputStream inputStream)
             throws JSONException, IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line = "";
+        String line;
         StringBuilder result = new StringBuilder();
         while ((line = bufferedReader.readLine()) != null)
             result.append(line);
