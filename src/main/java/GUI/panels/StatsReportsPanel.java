@@ -17,7 +17,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
-public class StatsReports extends JPanel {
+public class StatsReportsPanel extends JPanel {
     private ChartPanel chartPanel = null;
     private TreeMap<String, Integer> datesAndCount;
     private final ArrayList<String> usersUID = new ArrayList<>();

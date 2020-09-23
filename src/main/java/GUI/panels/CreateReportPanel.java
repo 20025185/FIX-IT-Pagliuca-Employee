@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Objects;
 
-public class CreateReport extends JPanel {
+public class CreateReportPanel extends JPanel {
     private final JLabel oggettoLabel = new JLabel("Oggetto");
     private final JTextField oggettoReport = new JTextField();
     private final JLabel dataLabel = new JLabel("Data");

@@ -25,12 +25,12 @@ public class ControlPanel extends JFrame implements KeyListener {
     private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private static final DatabaseReference databaseReference = firebaseDatabase.getReference("reports");
 
-    private final static OpenReports openReportPanel = new OpenReports();
-    private final static PendingReports pendingReportPanel = new PendingReports(databaseReference);
-    private final static ClosedReports closedReportPanel = new ClosedReports() ;
-    private final static StreamingStatsReviews streamingStatsReviewsPanel = new StreamingStatsReviews();
-    private final static StatsReports statsReportsPanel = new StatsReports();
-    private final static CreateReport createReportPanel = new CreateReport();
+    private final static OpenReportsPanel openReportPanel = new OpenReportsPanel();
+    private final static PendingReportsPanel pendingReportPanel = new PendingReportsPanel(databaseReference);
+    private final static ClosedReportsPanel closedReportPanel = new ClosedReportsPanel();
+    private final static StreamingStatsReviewsPanel streamingStatsReviewsPanel = new StreamingStatsReviewsPanel();
+    private final static StatsReportsPanel statsReportsPanel = new StatsReportsPanel();
+    private final static CreateReportPanel createReportPanel = new CreateReportPanel();
 
     //  Semaforo per la distribuzione dei record nei vari panels
     private final Semaphore semaphore = new Semaphore(0);
@@ -43,9 +43,9 @@ public class ControlPanel extends JFrame implements KeyListener {
         addKeyListener(this);
         Utils utils = new Utils();
 
-        Profile profile = new Profile();
-        profile.loadProfilePanel(loggedEmployee);
-        profile.setLocationAndSize();
+        ProfilePanel profilePanel = new ProfilePanel();
+        profilePanel.loadProfilePanel(loggedEmployee);
+        profilePanel.setLocationAndSize();
 
         pendingReportPanel.loadPendingReportsPanel(pendingReportIDs);
         streamingStatsReviewsPanel.loadStatsRecensioniStream();
@@ -87,21 +87,23 @@ public class ControlPanel extends JFrame implements KeyListener {
                         chatInstances,
                         this);
                 closedReportPanel.updateClosedReportsPanel(closedReportIDs);
-            } else if (cardShowed == 4) {
-                //
-            } else if (cardShowed == 5) {
-                //
-            } else if (cardShowed == 6) {
+            } else //noinspection StatementWithEmptyBody
+                if (cardShowed == 4) {
+
+            } else //noinspection StatementWithEmptyBody
+                if (cardShowed == 5) {
+
+            } else //noinspection StatementWithEmptyBody
+                    if (cardShowed == 6) {
 
             }
-
         };
 
         ScheduledExecutorService dynamicPanelsExecutor = Executors.newSingleThreadScheduledExecutor();
         dynamicPanelsExecutor.scheduleAtFixedRate(
                 dynamicPanels,
                 0,
-                800,
+                500,
                 TimeUnit.MILLISECONDS);
 
         CardLayout cardLayout = new CardLayout();
@@ -110,7 +112,7 @@ public class ControlPanel extends JFrame implements KeyListener {
         utils.initialize(this);
         utils.setLayoutManager(container,
                 cardLayout,
-                profile,
+                profilePanel,
                 pendingReportPanel,
                 openReportPanel,
                 closedReportPanel,

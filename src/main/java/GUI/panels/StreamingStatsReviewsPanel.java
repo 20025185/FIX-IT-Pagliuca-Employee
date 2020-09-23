@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class StreamingStatsReviews extends JPanel {
+public class StreamingStatsReviewsPanel extends JPanel {
     private HashMap<String, String> stringStringHashMap = new HashMap<>();
     private JFreeChart chart;
     private ChartPanel chartPanel;

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Profile extends JPanel {
+public class ProfilePanel extends JPanel {
     private Image profileImg = null;
     private Employee employee;
 
@@ -29,10 +29,8 @@ public class Profile extends JPanel {
                         "<br>Codice fiscale: "  + employee.getFiscalCode()   + "" +
                         "<br>e-mail: "  + employee.getEmail()     + "" +
                         "<br><u>UID: "  + employee.getUID()    + "</u></center></html>");
-        //employeeInfo.setOpaque(true);
         Border border = BorderFactory.createLineBorder(Color.PINK, 3);
         employeeInfo.setBorder(border);
-        //employeeInfo.setBackground(Color.PINK);
         this.setLayout(new BorderLayout());
         employeeInfo.setHorizontalAlignment(JLabel.CENTER);
         employeeInfo.setVerticalAlignment(JLabel.CENTER);
