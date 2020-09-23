@@ -22,13 +22,13 @@ public class ProfilePanel extends JPanel {
 
     private void loadItemsOnPanel() {
         JLabel employeeInfo = new JLabel(
-                   "<html><center><br><br><br><br><br><center><h1><u>Profilo impiegato</u></h1>"    +
-                        "<br>Nome: " + employee.getFullname()  + "" +
-                        "<br>Cognome: "  + employee.getSurname()   + "" +
-                        "<br>Data di nascita: "  + employee.getBirthday()   + "" +
-                        "<br>Codice fiscale: "  + employee.getFiscalCode()   + "" +
-                        "<br>e-mail: "  + employee.getEmail()     + "" +
-                        "<br><u>UID: "  + employee.getUID()    + "</u></center></html>");
+                "<html><center><br><br><br><br><br><center><h1><u>Profilo impiegato</u></h1>" +
+                        "<br>Nome: " + employee.getFullname() + "" +
+                        "<br>Cognome: " + employee.getSurname() + "" +
+                        "<br>Data di nascita: " + employee.getBirthday() + "" +
+                        "<br>Codice fiscale: " + employee.getFiscalCode() + "" +
+                        "<br>e-mail: " + employee.getEmail() + "" +
+                        "<br><u>UID: " + employee.getUID() + "</u></center></html>");
         Border border = BorderFactory.createLineBorder(Color.PINK, 3);
         employeeInfo.setBorder(border);
         this.setLayout(new BorderLayout());
@@ -38,13 +38,15 @@ public class ProfilePanel extends JPanel {
     }
 
     private void retrieveProfileImg() throws IOException {
-        try {
-            URL url = new URL(employee.getImageURL());
-            profileImg = ImageIO.read(url);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        if (!employee.getImageURL().isEmpty()) {
+            try {
+                URL url = new URL(employee.getImageURL());
+                profileImg = ImageIO.read(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            profileImg = profileImg.getScaledInstance(200, 200, Image.SCALE_DEFAULT);
         }
-        profileImg = profileImg.getScaledInstance(200, 200, Image.SCALE_DEFAULT);
     }
 
     @Override
