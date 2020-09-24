@@ -2,8 +2,8 @@ package GUI.panels;
 
 import GUI.dialogs.ChatBidirectional;
 import com.google.firebase.database.*;
-import utils.Employee;
-import utils.Report;
+import firebase.Employee;
+import firebase.Report;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
+@SuppressWarnings("JavaDoc")
 public class OpenReportsPanel extends JPanel {
     //  SplitPane, nella parte sinistra è presente una JList contenente gli id dei record, nella parte destrea le loro informazioni
     private static JSplitPane openSplitPane = new JSplitPane();
@@ -32,14 +33,25 @@ public class OpenReportsPanel extends JPanel {
     private final JRadioButton closedRadioBtn = new JRadioButton("Chiusa");
     private final JButton submitStatusBtn = new JButton("Imposta");
 
+    //  Riferimento al nodo del database "reports"
     private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private final DatabaseReference databaseReference = firebaseDatabase.getReference("reports");
 
+    //  Singolo report che viene compilato per effettuare le operazioni
     private static Report singleOpenReport;
+
+    //  Istanza dell'impiegato, viene utilizzata per aprire una chat con l'utente.
     private Employee employee;
+
+    //  Ultimo indice selezionato della JList
     private int lastSelectedIndex;
+
+    //  Ultimo colore relativo all'ID dell'ultimo report selzionato nella JList.
     private int lastIndexPriorityColour;
 
+    /***
+     * Costruttore che genera il layout, i RadioButtons vengono unificati sotto un univo ButtonGroup.
+     */
     public OpenReportsPanel() {
         rightComponentPane.setLayout(new BoxLayout(rightComponentPane, BoxLayout.Y_AXIS));
         ButtonGroup statusButtons = new ButtonGroup();
@@ -47,6 +59,13 @@ public class OpenReportsPanel extends JPanel {
         statusButtons.add(closedRadioBtn);
     }
 
+    /***
+     * Metodo che si occupa di aggiornare il JSplitPane nella sua parte destra e sinistra, in ingresso viene fornito il
+     * vettore contenente i report con status "Aperta", questa funzione viene continuamente chiamata nel Runnable-> dynamicPanels
+     * del ControlPanel.java.
+     * @param new_openReports
+     * @param chatInstances
+     */
     public void updateOpenReportsPanel(Vector<String> new_openReports,
                                        Vector<ChatBidirectional> chatInstances) {
         jListOpenReports = new JList<>(new_openReports);
@@ -67,6 +86,12 @@ public class OpenReportsPanel extends JPanel {
         mySelection(new_openReports, chatInstances, employee);
     }
 
+    /***
+     * Metodo che da un primo avvio (manuale) al pannello.
+     * @param openReportIDs
+     * @param chatInstances
+     * @param employee
+     */
     public void loadOpenReportsPanel(Vector<String> openReportIDs,
                                      Vector<ChatBidirectional> chatInstances,
                                      Employee employee) {
@@ -83,10 +108,21 @@ public class OpenReportsPanel extends JPanel {
         this.add(openSplitPane);
     }
 
+    /***
+     * Questo metodo si occupa sia di scaricare tutte le informazioni del report e di distribuirle sulla parte destra del
+     * JSplitPane e fornire la possibilità di svolgere delle operazioni di amministrazione sui report (tramite i bottoni).
+     * Ma anche di aprire una chat in RT con l'utente che ha effettuato la segnalazione.
+     *
+     * Le due operazioni sono differenziate dal numero di click, 1 click sull'elemento dell JList mostrerò a video le informazioni
+     * relative alla segnalazione, 2-clock sull'elemento della JList permetteranno di aprire una finestra a parte per chattare con l'utente
+     * o consegnargli un messaggio.
+     * @param openReportIDs
+     * @param chatInstances
+     * @param employee
+     */
     private void mySelection(Vector<String> openReportIDs,
                              Vector<ChatBidirectional> chatInstances,
                              Employee employee) {
-
         jListOpenReports.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -184,6 +220,11 @@ public class OpenReportsPanel extends JPanel {
         });
     }
 
+    /***
+     * Metodo che gestisce il bottone di Submit, questo bottone cambia lo status della segnalazione in base a quale RadioButton è stato
+     * selezionato, non sono presenti altre operazioni di default.
+     * @param openReportIDs
+     */
     private void submitButtonListener(Vector<String> openReportIDs) {
         submitStatusBtn.addActionListener(e1 -> {
             if (pendingRadioBtn.isSelected()) {
@@ -205,22 +246,51 @@ public class OpenReportsPanel extends JPanel {
         });
     }
 
-    private void setLastIndexItemBackground() {
-        switch (lastIndexPriorityColour) {
-            case 0:
-                jListOpenReports.setSelectionBackground(Color.GREEN);
-                break;
-            case 1:
-                jListOpenReports.setSelectionBackground(Color.YELLOW);
-                break;
-            case 2:
-                jListOpenReports.setSelectionBackground(Color.RED);
-                break;
-            default:
-                jListOpenReports.setSelectionBackground(Color.GRAY);
+    /***
+     * Metodo utilitario che pulisce le varie JLabels e JButtons della parte destra del JSplitPane, "rightComponentPane".
+     */
+    private void clearAndRepaintAllComponents() {
+        openReportlabelInfo.setText("");
+        rightComponentPane.remove(openReportlabelInfo);
+
+        attachmentImgLink.setText("");
+        rightComponentPane.remove(attachmentImgLink);
+        rightComponentPane.remove(pendingRadioBtn);
+        rightComponentPane.remove(closedRadioBtn);
+        rightComponentPane.remove(submitStatusBtn);
+
+        rightComponentPane.revalidate();
+        rightComponentPane.repaint();
+    }
+
+    /***
+     * Metodo utilitario che imposta, nel caso fosse presente l'URL, la label-link cliccabile con l'URL passato come parametro.
+     * In questa maniera sarà possibile visualizzare gli allegati relativi al report selezionato in una finestra del browser predefinito.
+     * @param attachImg
+     */
+    private void setImgLabel(String attachImg) {
+        if (attachImg != null) {
+            attachmentImgLink.setText("<html><a href=\" " + attachImg + "\">Allegato</a><br><br></html>");
+            attachmentImgLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            attachmentImgLink.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    super.mouseClicked(e);
+                    try {
+                        Desktop.getDesktop().browse(new URI(attachImg));
+                    } catch (URISyntaxException | IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
         }
     }
 
+    /***
+     * Metodo utilitario, imposta il background dell'item selezionato in base alla priorità della relativa segnalazione e ne
+     * effettua il salvataggio dell'ultimo colore selezionato sulla variabile "lastIndexPriorityColour".
+     * @param priority
+     */
     private void saveIndexAndSetColor(String priority) {
         switch (priority) {
             case "0":
@@ -241,38 +311,29 @@ public class OpenReportsPanel extends JPanel {
         }
     }
 
-    private void setImgLabel(String attachImg) {
-        if (attachImg != null) {
-            attachmentImgLink.setText("<html><a href=\" " + attachImg + "\">Allegato</a><br><br></html>");
-            attachmentImgLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            attachmentImgLink.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    super.mouseClicked(e);
-                    try {
-                        Desktop.getDesktop().browse(new URI(attachImg));
-                    } catch (URISyntaxException | IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
+    /***
+     * Metodo utilitario, lo si utilizza nella funzione di aggiornamento per mantenere il colore dell'elemento selezionato
+     * (precedentemente, perchè la funzione continua a riaggiornare).
+     */
+    private void setLastIndexItemBackground() {
+        switch (lastIndexPriorityColour) {
+            case 0:
+                jListOpenReports.setSelectionBackground(Color.GREEN);
+                break;
+            case 1:
+                jListOpenReports.setSelectionBackground(Color.YELLOW);
+                break;
+            case 2:
+                jListOpenReports.setSelectionBackground(Color.RED);
+                break;
+            default:
+                jListOpenReports.setSelectionBackground(Color.GRAY);
         }
     }
 
-    private void clearAndRepaintAllComponents() {
-        openReportlabelInfo.setText("");
-        rightComponentPane.remove(openReportlabelInfo);
-
-        attachmentImgLink.setText("");
-        rightComponentPane.remove(attachmentImgLink);
-        rightComponentPane.remove(pendingRadioBtn);
-        rightComponentPane.remove(closedRadioBtn);
-        rightComponentPane.remove(submitStatusBtn);
-
-        rightComponentPane.revalidate();
-        rightComponentPane.repaint();
-    }
-
+    /***
+     * Metodo utilitario per impostare le configurazioni dello SplitPane.
+     */
     private void setSplitPane() {
         JScrollPane jScrollPane = new JScrollPane(jListOpenReports);
         openSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

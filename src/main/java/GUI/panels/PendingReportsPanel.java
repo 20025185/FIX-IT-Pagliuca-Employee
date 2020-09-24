@@ -2,7 +2,7 @@ package GUI.panels;
 
 import GUI.dialogs.EditReportFrame;
 import com.google.firebase.database.*;
-import utils.Report;
+import firebase.Report;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,43 +14,63 @@ import java.net.URISyntaxException;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
+@SuppressWarnings("Javadoc")
 public class PendingReportsPanel extends JPanel {
-    private final DatabaseReference databaseReference;
-    private JSplitPane pendingSplitPane = new JSplitPane();
+    //  SplitPane, nella parte sinistra è presente una JList contenente gli id dei record, nella parte destrea le loro informazioni
+    private static JSplitPane pendingSplitPane = new JSplitPane();
+    private static JList<String> jListPendingReports;           //  SX
+    private final JPanel rightComponentPane = new JPanel();     //  DX
 
+    //  Bottoni che permetteno di effettuare la modifica della segnalazione (aprendo un dialog) o di aprire direttamente la segnalazione
     private final JButton editBtn = new JButton("Edit");
     private final JButton openStatusBtn = new JButton("Apri Segnalazione");
 
-    //  Label
+    //  Label che vengono aggiornate sulla parte destra dello split pane.
     private final JLabel attachmentImgLink = new JLabel();
     private final JLabel labelReportInfo = new JLabel();
 
-    private final JPanel rightPanel = new JPanel();
+    //  Riferimento al nodo del database "reports"
+    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private final DatabaseReference databaseReference = firebaseDatabase.getReference("reports");
+
+    //  Singolo report che viene compilato per effettuare le operazioni
     private static Report singlePendingReport;
+
+    //  Vettore contenente gli ID dei report in attesa
     private static Vector<String> pendingReportIDs;
-    private static JList<String> stringJList;
+
+    //  Ultimo indice selezionato della JList
     private int lastSelectedIndex;
+
+    //  Ultimo colore relativo all'ID dell'ultimo report selzionato nella JList.
     private int lastIndexPriorityColour;
 
-    public PendingReportsPanel(DatabaseReference ref) {
-        this.databaseReference = ref;
-
+    /***
+     * Costruttore che genera il layout e chiama un metodo che gestisce i bottoni del pannello.
+     */
+    public PendingReportsPanel() {
         labelReportInfo.setHorizontalAlignment(SwingConstants.LEFT);
         labelReportInfo.setVerticalAlignment(SwingConstants.TOP);
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightComponentPane.setLayout(new BoxLayout(rightComponentPane, BoxLayout.Y_AXIS));
         this.setPreferredSize(new Dimension(800, 600));
-
         handlePendingReportsButtons();
     }
 
+    /***
+     * Metodo che si occupa di aggiornare il JSplitPane nella sua parte destra e sinistra, in ingresso viene fornito il
+     * vettore contenente i report con status "Aperta", questa funzione viene continuamente chiamata nel Runnable-> dynamicPanels
+     * del ControlPanel.java.
+     * @param t_newReports
+     */
     public void updatePendingReportsPanel(Vector<String> t_newReports) {
-        stringJList = new JList<>(t_newReports);
-        stringJList.setSelectedIndex(lastSelectedIndex);
+        jListPendingReports = new JList<>(t_newReports);
+        jListPendingReports.setSelectedIndex(lastSelectedIndex);
 
         setLastIndexItemBackground();
 
         this.remove(pendingSplitPane.getLeftComponent());
-        pendingSplitPane.setLeftComponent(stringJList);
+
+        pendingSplitPane.setLeftComponent(jListPendingReports);
         pendingSplitPane.setDividerLocation(180);
 
         this.revalidate();
@@ -59,18 +79,21 @@ public class PendingReportsPanel extends JPanel {
         mySelection();
     }
 
-
+    /***
+     * Metodo che da un primo avvio (manuale) al pannello.
+     * @param t_pendingReportIDs
+     */
     public void loadPendingReportsPanel(Vector<String> t_pendingReportIDs) {
         pendingReportIDs = t_pendingReportIDs;
-        stringJList = new JList<>(pendingReportIDs);
+        jListPendingReports = new JList<>(pendingReportIDs);
 
         mySelection();
 
-        JScrollPane jScrollPane = new JScrollPane(stringJList);
+        JScrollPane jScrollPane = new JScrollPane(jListPendingReports);
         pendingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         pendingSplitPane.setContinuousLayout(false);
         pendingSplitPane.setLeftComponent(jScrollPane);
-        pendingSplitPane.setRightComponent(rightPanel);
+        pendingSplitPane.setRightComponent(rightComponentPane);
         pendingSplitPane.setDividerLocation(180);
         pendingSplitPane.setOneTouchExpandable(true);
         pendingSplitPane.setPreferredSize(new Dimension(750, 520));
@@ -78,47 +101,23 @@ public class PendingReportsPanel extends JPanel {
         this.add(pendingSplitPane);
     }
 
-    private void handlePendingReportsButtons() {
-        editBtn.addActionListener(e -> {
-            new EditReportFrame(singlePendingReport);
-
-            if (singlePendingReport.getStatus().equals("Aperta") || singlePendingReport.getStatus().equals("Chiusa")) {
-                pendingReportIDs.remove(singlePendingReport.getId());
-            }
-
-            rightPanel.removeAll();
-            labelReportInfo.setText("");
-            this.removeAll();
-            this.add(pendingSplitPane);
-            this.revalidate();
-            this.repaint();
-        });
-
-        openStatusBtn.addActionListener(e -> {
-            databaseReference.child(singlePendingReport.getId()).child("status").setValueAsync("Aperta_" + singlePendingReport.getUid());
-            pendingReportIDs.remove(singlePendingReport.getId());
-
-            this.removeAll();
-            this.add(pendingSplitPane);
-            this.revalidate();
-            this.repaint();
-        });
-    }
-
-    public void mySelection() {
-        stringJList.addMouseListener(new MouseAdapter() {
+    /***
+     * Questo metodo si occupa sia di scaricare tutte le informazioni del report in attesa, e di distribuirle sulla parte destra del
+     * JSplitPane e fornire la possibilità di svolgere delle operazioni di amministrazione sui report (tramite i bottoni).
+     */
+    private void mySelection() {
+        jListPendingReports.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
 
-                if (stringJList.getSelectedValue() != null) {
-                    final String reportID = stringJList.getSelectedValue();
-                    final DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("reports").child(stringJList.getSelectedValue());
+                if (jListPendingReports.getSelectedValue() != null) {
+                    final String reportID = jListPendingReports.getSelectedValue();
+                    final DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("reports").child(jListPendingReports.getSelectedValue());
                     Semaphore semaphore = new Semaphore(1);
-                    lastSelectedIndex = stringJList.getSelectedIndex();
+                    lastSelectedIndex = jListPendingReports.getSelectedIndex();
 
                     clearAndRepaintAllComponents();
-
 
                     dbr.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -174,10 +173,10 @@ public class PendingReportsPanel extends JPanel {
                         interruptedException.printStackTrace();
                     }
 
-                    rightPanel.add(labelReportInfo);
-                    rightPanel.add(attachmentImgLink);
-                    rightPanel.add(editBtn);
-                    rightPanel.add(openStatusBtn);
+                    rightComponentPane.add(labelReportInfo);
+                    rightComponentPane.add(attachmentImgLink);
+                    rightComponentPane.add(editBtn);
+                    rightComponentPane.add(openStatusBtn);
 
                     semaphore.release();
                 }
@@ -185,37 +184,85 @@ public class PendingReportsPanel extends JPanel {
         });
     }
 
+    /***
+     * Metodo contenente i listener dei bottoni presenti all'interno del programma.
+     *
+     * Edit button -> Apre un nuovo frame che permette la modifica di diversi campi importanti (spiegata nel dettagliio nella relativa classe).
+     * Se questa modifica cambia lo status, l'ID del relativo report viene rimosso dal vettore dei report in attesa.
+     * Alla fine si effettua una pulizia delle componenti disposte sullo SplitPane.
+     */
+    private void handlePendingReportsButtons() {
+        editBtn.addActionListener(e -> {
+            new EditReportFrame(singlePendingReport);
+
+            if (singlePendingReport.getStatus().equals("Aperta") || singlePendingReport.getStatus().equals("Chiusa")) {
+                pendingReportIDs.remove(singlePendingReport.getId());
+            }
+
+            rightComponentPane.removeAll();
+            labelReportInfo.setText("");
+            this.removeAll();
+            this.add(pendingSplitPane);
+            this.revalidate();
+            this.repaint();
+        });
+
+        openStatusBtn.addActionListener(e -> {
+            databaseReference.child(singlePendingReport.getId()).child("status").setValueAsync("Aperta_" + singlePendingReport.getUid());
+            pendingReportIDs.remove(singlePendingReport.getId());
+
+            this.removeAll();
+            this.add(pendingSplitPane);
+            this.revalidate();
+            this.repaint();
+        });
+    }
+
+    /***
+     * Metodo utilitario, imposta il background dell'item selezionato in base alla priorità della relativa segnalazione e ne
+     * effettua il salvataggio dell'ultimo colore selezionato sulla variabile "lastIndexPriorityColour".
+     * @param priority
+     */
     private void saveIndexAndSetColor(String priority) {
         switch (priority) {
             case "0":
-                stringJList.setSelectionBackground(Color.GREEN);
+                jListPendingReports.setSelectionBackground(Color.GREEN);
                 lastIndexPriorityColour = 0;
                 break;
             case "1":
-                stringJList.setSelectionBackground(Color.YELLOW);
+                jListPendingReports.setSelectionBackground(Color.YELLOW);
                 lastIndexPriorityColour = 1;
                 break;
             case "2":
-                stringJList.setSelectionBackground(Color.RED);
+                jListPendingReports.setSelectionBackground(Color.RED);
                 lastIndexPriorityColour = 2;
                 break;
             default:
-                stringJList.setSelectionBackground(Color.GRAY);
+                jListPendingReports.setSelectionBackground(Color.GRAY);
                 break;
         }
     }
 
+    /***
+     * Metodo utilitario, lo si utilizza nella funzione di aggiornamento per mantenere il colore dell'elemento selezionato
+     * (precedentemente, perchè la funzione continua a riaggiornare).
+     */
     private void clearAndRepaintAllComponents() {
         labelReportInfo.setText("");
-        rightPanel.remove(labelReportInfo);
+        rightComponentPane.remove(labelReportInfo);
 
         attachmentImgLink.setText("");
-        rightPanel.remove(attachmentImgLink);
+        rightComponentPane.remove(attachmentImgLink);
 
-        rightPanel.revalidate();
-        rightPanel.repaint();
+        rightComponentPane.revalidate();
+        rightComponentPane.repaint();
     }
 
+    /***
+     * Metodo utilitario che imposta, nel caso fosse presente l'URL, la label-link cliccabile con l'URL passato come parametro.
+     * In questa maniera sarà possibile visualizzare gli allegati relativi al report selezionato in una finestra del browser predefinito.
+     * @param attachImg
+     */
     private void setImgLabel(String attachImg) {
         if (attachImg != null) {
             attachmentImgLink.setText("<html><a href=\" " + attachImg + "\">Allegato</a><br><br></html>");
@@ -234,20 +281,23 @@ public class PendingReportsPanel extends JPanel {
         }
     }
 
+    /***
+     * Metodo utilitario, lo si utilizza nella funzione di aggiornamento per mantenere il colore dell'elemento selezionato
+     * (precedentemente, perchè la funzione continua a riaggiornare).
+     */
     private void setLastIndexItemBackground() {
         switch (lastIndexPriorityColour) {
             case 0:
-                stringJList.setSelectionBackground(Color.GREEN);
+                jListPendingReports.setSelectionBackground(Color.GREEN);
                 break;
             case 1:
-                stringJList.setSelectionBackground(Color.YELLOW);
+                jListPendingReports.setSelectionBackground(Color.YELLOW);
                 break;
             case 2:
-                stringJList.setSelectionBackground(Color.RED);
+                jListPendingReports.setSelectionBackground(Color.RED);
                 break;
             default:
-                stringJList.setSelectionBackground(Color.GRAY);
+                jListPendingReports.setSelectionBackground(Color.GRAY);
         }
     }
-
 }

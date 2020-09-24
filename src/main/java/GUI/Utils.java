@@ -1,6 +1,5 @@
-package GUI.others;
+package GUI;
 
-import GUI.ControlPanel;
 import GUI.dialogs.ChatBidirectional;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,8 +12,14 @@ import java.awt.event.ActionEvent;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
+@SuppressWarnings("ALL")
 public class Utils {
-
+    /***
+     * Metodo che crea la barra in alto dell'applicazione, si occupa anche di assegn
+     * @param cardLayout
+     * @param container
+     * @param controlPanel
+     */
     public void initMenu(CardLayout cardLayout, Container container, ControlPanel controlPanel) {
         JMenuBar jMenuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
@@ -102,9 +107,12 @@ public class Utils {
         jMenuBar.add(reportMenu);
 
         controlPanel.setJMenuBar(jMenuBar);
-
     }
 
+    /***
+     * Inizializza il pannello centrale.
+     * @param controlPanel
+     */
     public void initialize(ControlPanel controlPanel) {
         controlPanel.setTitle("CONTROL PANEL v0.0.2");
         controlPanel.setSize(800, 600);
@@ -112,8 +120,25 @@ public class Utils {
         controlPanel.setVisible(true);
         controlPanel.setResizable(false);
         controlPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        ImageIcon favicon = new ImageIcon("src\\imgs\\icons\\icon.png");
+        controlPanel.setIconImage(favicon.getImage());
     }
 
+    /***
+     * Metodo che si occupa di scaricare tutte le segnalazioni presenti sulla piattaforma e smistarle in base al loro status.
+     * Segnalazioni in attesa   -> pendingReportIDs
+     * Segnalazioni aperte      -> openReportIDs
+     * Segnalazioni chiuse      -> closedReportIDs
+     *
+     * @param pendingReportIDs
+     * @param openReportIDs
+     * @param closedReportIDs
+     * @param databaseReference
+     * @param semaphore
+     * @param chatInstances
+     * @param controlPanel
+     */
     public void retrieveReportsIDs(Vector<String> pendingReportIDs,
                                    Vector<String> openReportIDs,
                                    Vector<String> closedReportIDs,
@@ -144,9 +169,9 @@ public class Utils {
                     }
                 }
 
-                checkIntegrity(pendingReportIDs, "Pending", dataSnapshot);
-                checkIntegrity(openReportIDs, "Aperta", dataSnapshot);
-                checkIntegrity(closedReportIDs, "Chiusa", dataSnapshot);
+                checkIntegrityAndRebalance(pendingReportIDs, "Pending", dataSnapshot);
+                checkIntegrityAndRebalance(openReportIDs, "Aperta", dataSnapshot);
+                checkIntegrityAndRebalance(closedReportIDs, "Chiusa", dataSnapshot);
 
                 semaphore.release();
 
@@ -162,7 +187,22 @@ public class Utils {
         });
     }
 
-    private void checkIntegrity(Vector<String> vectorIDs, String status, DataSnapshot dataSnapshot) {
+    /***
+     * Controllo di integrità del vettore delle segnalazioni.
+     * Quello che viene effettuato, dato in ingresso un vettore ed il suo status supposto assieme ad uno snapshot (viene chiamata all'interno di una
+     * funzione asincrona).
+     *
+     * Per ogni report contenuto nel vettore in ingresso, ne controllo l'effettiva presenta sul RTD controllando che in ogni report del database (che hanno lo status uguale
+     * a quello fornito come parametro), ne sia presente l'uid. In caso contrario si ribilancia il vettore rimuovendo quel report, in modo da ottenere una mappa veritiera dei
+     * report nel DB.
+     *
+     * Analogia :
+     * È come se si creasse virtualmente un nodo figlio sul RTD che contiene tutti i report con un determinato status, e poi si controlla la presenza dei report nel vettore con
+     * quelli sul RTD.
+     * @param status
+     * @param dataSnapshot
+     */
+    private void checkIntegrityAndRebalance(Vector<String> vectorIDs, String status, DataSnapshot dataSnapshot) {
         boolean isThere = false;
 
         for (String str : vectorIDs) {
@@ -180,6 +220,19 @@ public class Utils {
         }
     }
 
+    /***
+     * Si aggiunge al container i relativi pannelli con il rispettivo indice del CardLayout.
+     * @param container
+     * @param cardLayout
+     * @param profilePanel
+     * @param pendingReportPanel
+     * @param openReportPanel
+     * @param closedReportPanel
+     * @param statsReviewsPanel
+     * @param statsReportsPanel
+     * @param createReportPanel
+     * @param controlPanel
+     */
     public void setLayoutManager(Container container, CardLayout cardLayout, JPanel profilePanel, JPanel pendingReportPanel,
                                  JPanel openReportPanel,
                                  JPanel closedReportPanel,

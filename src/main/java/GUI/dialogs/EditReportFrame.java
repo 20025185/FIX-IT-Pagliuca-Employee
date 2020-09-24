@@ -1,7 +1,7 @@
 package GUI.dialogs;
 
 import com.google.firebase.database.*;
-import utils.Report;
+import firebase.Report;
 import javax.swing.*;
 import java.awt.*;
 import java.text.SimpleDateFormat;

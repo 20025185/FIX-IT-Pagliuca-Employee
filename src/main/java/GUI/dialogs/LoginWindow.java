@@ -1,8 +1,8 @@
 package GUI.dialogs;
 
 import GUI.ControlPanel;
-import utils.Employee;
-import utils.FirebaseAPI;
+import firebase.Employee;
+import firebase.FirebaseAPI;
 
 import javax.swing.*;
 import java.awt.*;

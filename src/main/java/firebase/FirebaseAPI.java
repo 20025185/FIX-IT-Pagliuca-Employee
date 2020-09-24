@@ -1,5 +1,8 @@
-package utils;
+package firebase;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,7 +96,7 @@ public class FirebaseAPI {
                 if (dataSnapshot.getValue() != null) {
                     employee = new Employee();
                     employee.setEmail(email);
-                    employee.setUID(uid);
+                    employee.setUid(uid);
                     employee.setTokenID(token);
                     employee.setFiscalCode(dataSnapshot.child("fiscalCode").getValue().toString());
                     employee.setFullname(dataSnapshot.child("fullname").getValue().toString());
@@ -136,6 +139,22 @@ public class FirebaseAPI {
 
         inputStream.close();
         return new JSONObject(result.toString());
+    }
+
+    /***
+     * È effettivamente il primo metodo che viene lanciato, effettua il collegamento con Firebase utilizzando il file google-services.json
+     * fornito dalla piattaforma per permettersi di interfacciarsi con il database.
+     * @throws IOException
+     */
+    public static void initializeFirebase() throws IOException {
+        FileInputStream serviceAccount = new FileInputStream("src\\google-services\\pagliu-db-firebase-adminsdk-ml5ap-f0eb21cf94.json");
+
+        @SuppressWarnings("deprecation") FirebaseOptions options = new FirebaseOptions.Builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .setDatabaseUrl("https://pagliu-db.firebaseio.com")
+                .build();
+
+        FirebaseApp.initializeApp(options);
     }
 
 }

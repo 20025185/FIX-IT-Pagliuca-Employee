@@ -1,7 +1,7 @@
 package GUI.panels;
 
 import com.google.firebase.database.*;
-import utils.Report;
+import firebase.Report;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
+@SuppressWarnings("JavaDoc")
 public class ClosedReportsPanel extends JPanel {
     //  SplitPane, nella parte sinistra è presente una JList contenente gli id dei record, nella parte destrea le loro informazioni
     private JSplitPane splitPane = new JSplitPane();
@@ -26,19 +27,36 @@ public class ClosedReportsPanel extends JPanel {
     //  Bottone che serve a riaprire i record che hanno fatto una richiesta di riapertura
     private final JButton reopenReportBtn = new JButton("Riapri segnalazione");
 
+    //  Riferimento al nodo del database "reports"
     private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private final DatabaseReference databaseReference = firebaseDatabase.getReference("reports");
 
+    //  Vettore contenente gli ID dei report chiusi (viene aggiornato)
     private static Vector<String> closedReportsIDs;
+
+    //  Singolo report che viene compilato per effettuare le operazioni
     private static Report singleClosedReport;
+
+    //  Ultimo indice selezionato della JList
     private int lastSelectedIndex;
+
+    //  Ultimo colore relativo all'ID dell'ultimo report selzionato nella JList.
     private int lastIndexPriorityColour;
 
+    /***
+     * Costruttore che genera il layout e chiama il listener poer la gestione del bottone di riapertura del report.
+     */
     public ClosedReportsPanel() {
         rightComponentPane.setLayout(new BoxLayout(rightComponentPane, BoxLayout.Y_AXIS));
         handleReopenButton();
     }
 
+    /***
+     * Metodo che si occupa di aggiornare il JSplitPane nella sua parte destra e sinistra, in ingresso viene fornito il
+     * vettore contenente i report con status "Chiusa", questa funzione viene continuamente chiamata nel Runnable-> dynamicPanels
+     * del ControlPanel.java.
+     * @param newClosedReportsIDs
+     */
     public void updateClosedReportsPanel(Vector<String> newClosedReportsIDs) {
         jListClosedReports = new JList<>(newClosedReportsIDs);
         jListClosedReports.setSelectedIndex(lastSelectedIndex);
@@ -50,13 +68,18 @@ public class ClosedReportsPanel extends JPanel {
 
         mySelection();
 
-        setSplitPane();
+        splitPane.setRightComponent(rightComponentPane);
+        splitPane.setLeftComponent(jListClosedReports);
+        splitPane.setDividerLocation(180);
 
         this.revalidate();
         this.repaint();
     }
 
-
+    /***
+     * Metodo che da un primo avvio (manuale) al pannello.
+     * @param t_closedReportsIDs
+     */
     public void loadClosedReportsPanel(Vector<String> t_closedReportsIDs) {
         closedReportsIDs = t_closedReportsIDs;
         jListClosedReports = new JList<>(t_closedReportsIDs);
@@ -75,7 +98,14 @@ public class ClosedReportsPanel extends JPanel {
         this.add(splitPane);
     }
 
-    public void mySelection() {
+    /***
+     *  Questo metodo si occupa di scaricare i dati dei report chiusi una volta che si è selezionato l'ID sulla JList (ovvero
+     *  la parte sinistra dello SplitPane) e mostrarli nel parte destra dello SplitPanel, "RightComponentPane".
+     *  In alcuni casi, se nel report fosse presente un campo "request", allora in tal caso è stata effettuata una richiesta di riapertura
+     *  ed il bottone per riaprire la segnalazione sarà reso visibile.
+     *  Sarò a discrezione dell'impiegato effettuarne la riapertura o meno.
+     */
+    private void mySelection() {
         jListClosedReports.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -160,6 +190,9 @@ public class ClosedReportsPanel extends JPanel {
         });
     }
 
+    /***
+     * Metodo utilitario che pulisce le varie JLabels e JButtons della parte destra del JSplitPane, "rightComponentPane".
+     */
     private void clearAndRepaintAllComponents() {
         closedReportlabelInfo.setText("");
         rightComponentPane.remove(closedReportlabelInfo);
@@ -177,6 +210,11 @@ public class ClosedReportsPanel extends JPanel {
         rightComponentPane.repaint();
     }
 
+    /***
+     * Metodo utilitario che imposta, nel caso fosse presente l'URL, la label-link cliccabile con l'URL passato come parametro.
+     * In questa maniera sarà possibile visualizzare gli allegati relativi al report selezionato in una finestra del browser predefinito.
+     * @param attachImg
+     */
     private void setImgLabel(String attachImg) {
         if (attachImg != null) {
             attachmentImgLink.setText("<html><a href=\" " + attachImg + "\">Allegato</a><br><br></html>");
@@ -195,6 +233,26 @@ public class ClosedReportsPanel extends JPanel {
         }
     }
 
+    /***
+     * Metodo utilitario per la gestione del bottone di riapertura delle segnalazioni.
+     */
+    private void handleReopenButton() {
+        reopenReportBtn.addActionListener(e1 -> {
+            clearAndRepaintAllComponents();
+            databaseReference.child(singleClosedReport.getId()).child("status").setValueAsync("Aperta_" + singleClosedReport.getUid());
+            databaseReference.child(singleClosedReport.getId()).child("request").setValueAsync(null);
+            System.out.println(closedReportsIDs);
+            System.out.println(singleClosedReport.getId());
+            closedReportsIDs.remove(singleClosedReport.getId());
+            singleClosedReport = null;
+        });
+    }
+
+    /***
+     * Metodo utilitario, imposta il background dell'item selezionato in base alla priorità della relativa segnalazione e ne
+     * effettua il salvataggio dell'ultimo colore selezionato sulla variabile "lastIndexPriorityColour".
+     * @param priority
+     */
     private void saveIndexAndSetColor(String priority) {
         switch (priority) {
             case "0":
@@ -215,17 +273,10 @@ public class ClosedReportsPanel extends JPanel {
         }
     }
 
-    private void handleReopenButton() {
-        reopenReportBtn.addActionListener(e1 -> {
-            clearAndRepaintAllComponents();
-            reopenReport();
-            System.out.println(closedReportsIDs);
-            System.out.println(singleClosedReport.getId());
-            closedReportsIDs.remove(singleClosedReport.getId());
-            singleClosedReport = null;
-        });
-    }
-
+    /***
+     * Metodo utilitario, lo si utilizza nella funzione di aggiornamento per mantenere il colore dell'elemento selezionato
+     * (precedentemente, perchè la funzione continua a riaggiornare).
+     */
     private void setLastIndexItemBackground() {
         switch (lastIndexPriorityColour) {
             case 0:
@@ -240,16 +291,5 @@ public class ClosedReportsPanel extends JPanel {
             default:
                 jListClosedReports.setSelectionBackground(Color.GRAY);
         }
-    }
-
-    private void reopenReport() {
-        databaseReference.child(singleClosedReport.getId()).child("status").setValueAsync("Aperta_" + singleClosedReport.getUid());
-        databaseReference.child(singleClosedReport.getId()).child("request").setValueAsync(null);
-    }
-
-    private void setSplitPane() {
-        splitPane.setRightComponent(rightComponentPane);
-        splitPane.setLeftComponent(jListClosedReports);
-        splitPane.setDividerLocation(180);
     }
 }

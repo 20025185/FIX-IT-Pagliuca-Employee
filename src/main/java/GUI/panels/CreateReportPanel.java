@@ -1,8 +1,8 @@
 package GUI.panels;
 
 import com.google.firebase.database.*;
-import utils.Employee;
-import utils.Report;
+import firebase.Employee;
+import firebase.Report;
 
 import javax.swing.*;
 import java.util.Calendar;
@@ -53,7 +53,7 @@ public class CreateReportPanel extends JPanel {
             if (checkCampi()) {
                 String repId = databaseReference.push().getKey();
                 Report report = new Report(repId,
-                        loggedEmploye.getUID(),
+                        loggedEmploye.getUid(),
                         oggettoReport.getText(),
                         descReport.getText(),
                         date,
@@ -61,7 +61,7 @@ public class CreateReportPanel extends JPanel {
                         Objects.requireNonNull(issuesBox.getSelectedItem()).toString(),
                         coordReport.getText().replace(",", " "),
                         parsePriority(Objects.requireNonNull(getSelectedPriority())),
-                        Objects.requireNonNull(statusBox.getSelectedItem()).toString() + "_" + loggedEmploye.getUID(),
+                        Objects.requireNonNull(statusBox.getSelectedItem()).toString() + "_" + loggedEmploye.getUid(),
                         socialReport.getState()
                 );
                 databaseReference.child(repId).setValueAsync(report);
@@ -165,7 +165,7 @@ public class CreateReportPanel extends JPanel {
             if (!oggettoReport.getText().isEmpty()) {
                 if (!descReport.getText().isEmpty()) {
                     if (!coordReport.getText().isEmpty() &&
-                            coordReport.getText().matches("[- 0-9*.0-9*]*,[- 0-9*.0-9*]*")) {
+                            coordReport.getText().matches("[- 0-9*.0-9*],[- 0-9*.0-9*]")) {
                         if (getSelectedPriority() != null) {
                             return true;
                         } else {

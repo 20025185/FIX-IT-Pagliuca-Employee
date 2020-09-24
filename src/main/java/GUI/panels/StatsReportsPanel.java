@@ -24,6 +24,10 @@ public class StatsReportsPanel extends JPanel {
     private final ArrayList<String> activeUsers = new ArrayList<>();
     private int nonActiveUsers;
 
+    /***
+     *  Costruttore che imposta il layout del JPanel. Viene anche mostrata una ComboBox con tutti i possibili grafici selezionabili.
+     *  Al termine viene chiamato un metodo retrieveAllReportsData(),
+     */
     public void loadStatsEmployee() {
         this.setLayout(new BorderLayout());
         String[] options = {"Tutte le segnalazioni", "Bassa priorità", "Media priorità", "Alta priorità", "Budget", "Costo segnalazioni", "Utenti attivi"};
@@ -61,6 +65,9 @@ public class StatsReportsPanel extends JPanel {
         retrieveAllReportsData();
     }
 
+    /***
+     *
+     */
     private void retrieveUsersData() {
         if (chartPanel != null)
             this.remove(chartPanel);
@@ -141,14 +148,6 @@ public class StatsReportsPanel extends JPanel {
         this.add(chartPanel);
     }
 
-    private void chartConfig() {
-        chartPanel.setSize(500, 500);
-        chartPanel.setMaximumSize(new Dimension(500, 500));
-        chartPanel.setPreferredSize(new Dimension(500, 500));
-        chartPanel.setVisible(true);
-        chartPanel.setEnabled(false);
-    }
-
     private void RetrievePriorityReportsData(String priority) {
         if (chartPanel != null)
             this.remove(chartPanel);
@@ -222,6 +221,9 @@ public class StatsReportsPanel extends JPanel {
         this.add(chartPanel);
     }
 
+    /***
+     * 
+     */
     private void retrieveAllReportsData() {
         if (chartPanel != null)
             this.remove(chartPanel);
@@ -305,6 +307,14 @@ public class StatsReportsPanel extends JPanel {
         this.repaint();
         this.revalidate();
         this.add(chartPanel);
+    }
+
+    private void chartConfig() {
+        chartPanel.setSize(500, 500);
+        chartPanel.setMaximumSize(new Dimension(500, 500));
+        chartPanel.setPreferredSize(new Dimension(500, 500));
+        chartPanel.setVisible(true);
+        chartPanel.setEnabled(false);
     }
 
 }

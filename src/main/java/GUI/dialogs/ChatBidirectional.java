@@ -1,8 +1,8 @@
 package GUI.dialogs;
 
 import com.google.firebase.database.*;
-import utils.Employee;
-import utils.Report;
+import firebase.Employee;
+import firebase.Report;
 
 import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
