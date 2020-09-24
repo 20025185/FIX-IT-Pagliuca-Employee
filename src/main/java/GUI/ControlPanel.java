@@ -73,9 +73,7 @@ public class ControlPanel extends JFrame implements KeyListener {
         statsReportsPanel.loadStatsEmployee();
         openReportPanel.loadOpenReportsPanel(openReportIDs, chatInstances, loggedEmployee);
         closedReportPanel.loadClosedReportsPanel(closedReportIDs);
-
-        createReportPanel.setEmployee(loggedEmployee);
-        createReportPanel.loadCreateReportPanel();
+        createReportPanel.loadCreateReportPanel(loggedEmployee);
 
         Runnable dynamicPanels = () -> {
             if (cardShowed == 1) {

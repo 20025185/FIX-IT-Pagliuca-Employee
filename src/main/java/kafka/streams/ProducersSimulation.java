@@ -10,18 +10,23 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 
+@SuppressWarnings("ALL")
 public class ProducersSimulation {
-    @SuppressWarnings("BusyWait")
+
+    /***
+     *   Configurazione degli ack, ack=none -> il broker non risponde con ack,
+     *   ack=leader il kafka broker risponde con un ack che conferma che la partizione leader ha salvato il record.
+     *   ack=leader non è affidabile al 100% ,perchè se il leader fallisse subito dopo aver inviato l'ack il record potrebbe essere perso prima che gli ISR lo duplichino.
+     *   ack=all, significa che il leader riceve la conferma di write da tutte le ISR prima di inviare un ack al producer. garantisce che il record non sia stato perso finchè non
+     *   muore un ISR.
+     * @param args
+     */
     public static void main(String[] args) {
         Properties properties = new Properties();
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        /*  Configurazione degli ack, ack=none -> il broker non risponde con ack,
-            ack=leader il kafka broker risponde con un ack che conferma che la partizione leader ha salvato il record.
-            ack=leader non è affidabile al 100% ,perchè se il leader fallisse subito dopo aver inviato l'ack il record potrebbe essere perso prima che gli ISR lo duplichino.
-            ack=all, significa che il leader riceve la conferma di write da tutte le ISR prima di inviare un ack al producer. garantisce che il record non sia stato perso finchè non
-            muore un ISR.      */
+
         properties.setProperty(ProducerConfig.ACKS_CONFIG, "all");
 
         //  In caso di fallimento il producer proverà a rinviare altre 3 volte

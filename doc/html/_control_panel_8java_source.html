@@ -145,138 +145,134 @@ $(function() {
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        statsReportsPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_stats_reports_panel.html#ab1a5f59a76f4c4598f2c021aaee25a75">loadStatsEmployee</a>();</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        openReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_open_reports_panel.html#a5e678c844c3d3f233c0a9df3edd4bb0d">loadOpenReportsPanel</a>(openReportIDs, chatInstances, loggedEmployee);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        closedReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_closed_reports_panel.html#a4ce668bca135e09a42c896db2414e63f">loadClosedReportsPanel</a>(closedReportIDs);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        createReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_create_report_panel.html#a312811ed3b9d528485521ff7b6483a14">setEmployee</a>(loggedEmployee);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        createReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_create_report_panel.html#ab0737acb67f5db7908b953e30977dc89">loadCreateReportPanel</a>();</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        Runnable dynamicPanels = () -&gt; {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            <span class="keywordflow">if</span> (cardShowed == 1) {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                utils.<a class="code" href="class_g_u_i_1_1_utils.html#a037eb57e5e014796e6a6f13a2a05e5a6">retrieveReportsIDs</a>(</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;                        pendingReportIDs,</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;                        openReportIDs,</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                        closedReportIDs,</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                        databaseReference,</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                        semaphore,</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                        chatInstances,</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                        <span class="keyword">this</span>);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                pendingReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_pending_reports_panel.html#a3d576cfb9c0a7d29c263efda3a3a43d1">updatePendingReportsPanel</a>(pendingReportIDs);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (cardShowed == 2) {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                utils.<a class="code" href="class_g_u_i_1_1_utils.html#a037eb57e5e014796e6a6f13a2a05e5a6">retrieveReportsIDs</a>(</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                        pendingReportIDs,</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                        openReportIDs,</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                        closedReportIDs,</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                        databaseReference,</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                        semaphore,</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                        chatInstances,</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                        <span class="keyword">this</span>);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                openReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_open_reports_panel.html#aa9e12f88752891815bd815a43ff0846d">updateOpenReportsPanel</a>(openReportIDs, chatInstances);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (cardShowed == 3) {</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                utils.<a class="code" href="class_g_u_i_1_1_utils.html#a037eb57e5e014796e6a6f13a2a05e5a6">retrieveReportsIDs</a>(</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;                        pendingReportIDs,</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                        openReportIDs,</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                        closedReportIDs,</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                        databaseReference,</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                        semaphore,</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;                        chatInstances,</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                        <span class="keyword">this</span>);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                closedReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_closed_reports_panel.html#a8e84217aaf34b586a667c31817e3c176">updateClosedReportsPanel</a>(closedReportIDs);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            } <span class="keywordflow">else</span> <span class="comment">//noinspection StatementWithEmptyBody</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                <span class="keywordflow">if</span> (cardShowed == 4) {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                } <span class="keywordflow">else</span> <span class="comment">//noinspection StatementWithEmptyBody</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                    <span class="keywordflow">if</span> (cardShowed == 5) {</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;                    } <span class="keywordflow">else</span> <span class="comment">//noinspection StatementWithEmptyBody</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;                        <span class="keywordflow">if</span> (cardShowed == 6) {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                        }</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        };</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        ScheduledExecutorService dynamicPanelsExecutor = Executors.newSingleThreadScheduledExecutor();</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        dynamicPanelsExecutor.scheduleAtFixedRate(</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;                dynamicPanels,</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;                0,</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;                500,</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;                TimeUnit.MILLISECONDS);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        CardLayout cardLayout = <span class="keyword">new</span> CardLayout();</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        Container container = getContentPane();</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        utils.<a class="code" href="class_g_u_i_1_1_utils.html#a30be886d4934c6608a99836cfe3965c5">initMenu</a>(cardLayout, container, <span class="keyword">this</span>);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        utils.<a class="code" href="class_g_u_i_1_1_utils.html#a6fc34d3bfb3d1fcbffe0620145af39ad">initialize</a>(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        utils.<a class="code" href="class_g_u_i_1_1_utils.html#af7513d43c8d4f0f08499364ab76233fe">setLayoutManager</a>(container,</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                cardLayout,</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;                profilePanel,</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;                pendingReportPanel,</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;                openReportPanel,</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                closedReportPanel,</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                streamingStatsReviewsPanel,</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;                statsReportsPanel,</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;                createReportPanel,</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;                <span class="keyword">this</span>);</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    }</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="comment">    /***</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="comment">     * Metodo che aggiorna l&#39;indice relativa al pannello mostrato con il valore passato.</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="comment">     * @param val</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment">     */</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno"><a class="line" href="class_g_u_i_1_1_control_panel.html#a78eeac2a78f06d6f53500d672603dac9">  150</a></span>&#160;    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="class_g_u_i_1_1_control_panel.html#a78eeac2a78f06d6f53500d672603dac9">setCardShowed</a>(<span class="keywordtype">int</span> val) {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        cardShowed = val;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    }</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="comment">    /***</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="comment">     * Alla pressione del tasto F5 verranno mostrati sulla console lo stato dei vettori contenenti le segnalazioni smistate, questo serve</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment">     * per capire la posizione dei record all&#39;interno dell&#39;applicazione e che percorso stanno effettuando.</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment">     * È una piccola funzione di stampa utile per il debugging.</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment">     * @param e</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment">     */</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    @Override</div>
-<div class="line"><a name="l00161"></a><span class="lineno"><a class="line" href="class_g_u_i_1_1_control_panel.html#a5c1b55526f114eac4b0f506f924f415f">  161</a></span>&#160;    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="class_g_u_i_1_1_control_panel.html#a5c1b55526f114eac4b0f506f924f415f">keyPressed</a>(KeyEvent e) {</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="keywordtype">int</span> key = e.getKeyCode();</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">if</span> (key == KeyEvent.VK_F5) {</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;            <span class="keywordflow">try</span> {</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;                semaphore.acquire();</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;            } <span class="keywordflow">catch</span> (InterruptedException exception) {</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;                exception.printStackTrace();</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;            }</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            System.out.println(<span class="stringliteral">&quot;{Refreshed}\n&quot;</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                    + <span class="stringliteral">&quot;[PendingReports]:\n&quot;</span> + pendingReportIDs</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                    + <span class="stringliteral">&quot;\n\n[OpenReports]:\n&quot;</span> + openReportIDs</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                    + <span class="stringliteral">&quot;\n\n[ClosedReports]:\n&quot;</span> + closedReportIDs);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        }</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    }</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    @Override</div>
-<div class="line"><a name="l00179"></a><span class="lineno"><a class="line" href="class_g_u_i_1_1_control_panel.html#ac9cb454472bcf1e247f65adfd9fb67e9">  179</a></span>&#160;    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="class_g_u_i_1_1_control_panel.html#ac9cb454472bcf1e247f65adfd9fb67e9">keyTyped</a>(KeyEvent e) {</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        createReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_create_report_panel.html#a3b12079600caab7bf6631af39a9647b8">loadCreateReportPanel</a>(loggedEmployee);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        Runnable dynamicPanels = () -&gt; {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            <span class="keywordflow">if</span> (cardShowed == 1) {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                utils.<a class="code" href="class_g_u_i_1_1_utils.html#a037eb57e5e014796e6a6f13a2a05e5a6">retrieveReportsIDs</a>(</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                        pendingReportIDs,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                        openReportIDs,</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;                        closedReportIDs,</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;                        databaseReference,</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                        semaphore,</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                        chatInstances,</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                        <span class="keyword">this</span>);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                pendingReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_pending_reports_panel.html#a3d576cfb9c0a7d29c263efda3a3a43d1">updatePendingReportsPanel</a>(pendingReportIDs);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (cardShowed == 2) {</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                utils.<a class="code" href="class_g_u_i_1_1_utils.html#a037eb57e5e014796e6a6f13a2a05e5a6">retrieveReportsIDs</a>(</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                        pendingReportIDs,</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                        openReportIDs,</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                        closedReportIDs,</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                        databaseReference,</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                        semaphore,</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                        chatInstances,</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                        <span class="keyword">this</span>);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                openReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_open_reports_panel.html#aa9e12f88752891815bd815a43ff0846d">updateOpenReportsPanel</a>(openReportIDs, chatInstances);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (cardShowed == 3) {</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                utils.<a class="code" href="class_g_u_i_1_1_utils.html#a037eb57e5e014796e6a6f13a2a05e5a6">retrieveReportsIDs</a>(</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                        pendingReportIDs,</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                        openReportIDs,</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;                        closedReportIDs,</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                        databaseReference,</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                        semaphore,</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                        chatInstances,</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                        <span class="keyword">this</span>);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;                closedReportPanel.<a class="code" href="class_g_u_i_1_1panels_1_1_closed_reports_panel.html#a8e84217aaf34b586a667c31817e3c176">updateClosedReportsPanel</a>(closedReportIDs);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            } <span class="keywordflow">else</span> <span class="comment">//noinspection StatementWithEmptyBody</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                <span class="keywordflow">if</span> (cardShowed == 4) {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                } <span class="keywordflow">else</span> <span class="comment">//noinspection StatementWithEmptyBody</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                    <span class="keywordflow">if</span> (cardShowed == 5) {</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                    } <span class="keywordflow">else</span> <span class="comment">//noinspection StatementWithEmptyBody</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                        <span class="keywordflow">if</span> (cardShowed == 6) {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;                        }</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        };</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        ScheduledExecutorService dynamicPanelsExecutor = Executors.newSingleThreadScheduledExecutor();</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        dynamicPanelsExecutor.scheduleAtFixedRate(</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;                dynamicPanels,</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;                0,</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;                500,</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;                TimeUnit.MILLISECONDS);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        CardLayout cardLayout = <span class="keyword">new</span> CardLayout();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        Container container = getContentPane();</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        utils.<a class="code" href="class_g_u_i_1_1_utils.html#a30be886d4934c6608a99836cfe3965c5">initMenu</a>(cardLayout, container, <span class="keyword">this</span>);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        utils.<a class="code" href="class_g_u_i_1_1_utils.html#a6fc34d3bfb3d1fcbffe0620145af39ad">initialize</a>(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        utils.<a class="code" href="class_g_u_i_1_1_utils.html#af7513d43c8d4f0f08499364ab76233fe">setLayoutManager</a>(container,</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;                cardLayout,</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                profilePanel,</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                pendingReportPanel,</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;                openReportPanel,</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;                closedReportPanel,</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;                streamingStatsReviewsPanel,</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                statsReportsPanel,</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                createReportPanel,</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;                <span class="keyword">this</span>);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="comment">    /***</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="comment">     * Metodo che aggiorna l&#39;indice relativa al pannello mostrato con il valore passato.</span></div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="comment">     * @param val</span></div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="comment">     */</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="class_g_u_i_1_1_control_panel.html#a78eeac2a78f06d6f53500d672603dac9">  148</a></span>&#160;    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="class_g_u_i_1_1_control_panel.html#a78eeac2a78f06d6f53500d672603dac9">setCardShowed</a>(<span class="keywordtype">int</span> val) {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        cardShowed = val;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    }</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="comment">    /***</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="comment">     * Alla pressione del tasto F5 verranno mostrati sulla console lo stato dei vettori contenenti le segnalazioni smistate, questo serve</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="comment">     * per capire la posizione dei record all&#39;interno dell&#39;applicazione e che percorso stanno effettuando.</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="comment">     * È una piccola funzione di stampa utile per il debugging.</span></div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment">     * @param e</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment">     */</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    @Override</div>
+<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="class_g_u_i_1_1_control_panel.html#a5c1b55526f114eac4b0f506f924f415f">  159</a></span>&#160;    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="class_g_u_i_1_1_control_panel.html#a5c1b55526f114eac4b0f506f924f415f">keyPressed</a>(KeyEvent e) {</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keywordtype">int</span> key = e.getKeyCode();</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="keywordflow">if</span> (key == KeyEvent.VK_F5) {</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;            <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;                semaphore.acquire();</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;            } <span class="keywordflow">catch</span> (InterruptedException exception) {</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;                exception.printStackTrace();</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;            }</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;            System.out.println(<span class="stringliteral">&quot;{Refreshed}\n&quot;</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;                    + <span class="stringliteral">&quot;[PendingReports]:\n&quot;</span> + pendingReportIDs</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                    + <span class="stringliteral">&quot;\n\n[OpenReports]:\n&quot;</span> + openReportIDs</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                    + <span class="stringliteral">&quot;\n\n[ClosedReports]:\n&quot;</span> + closedReportIDs);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    }</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    @Override</div>
+<div class="line"><a name="l00177"></a><span class="lineno"><a class="line" href="class_g_u_i_1_1_control_panel.html#ac9cb454472bcf1e247f65adfd9fb67e9">  177</a></span>&#160;    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="class_g_u_i_1_1_control_panel.html#ac9cb454472bcf1e247f65adfd9fb67e9">keyTyped</a>(KeyEvent e) {</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    @Override</div>
-<div class="line"><a name="l00184"></a><span class="lineno"><a class="line" href="class_g_u_i_1_1_control_panel.html#a8b8b2ac320dec48f6dd2279628851c08">  184</a></span>&#160;    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="class_g_u_i_1_1_control_panel.html#a8b8b2ac320dec48f6dd2279628851c08">keyReleased</a>(KeyEvent e) {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    @Override</div>
+<div class="line"><a name="l00182"></a><span class="lineno"><a class="line" href="class_g_u_i_1_1_control_panel.html#a8b8b2ac320dec48f6dd2279628851c08">  182</a></span>&#160;    <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="class_g_u_i_1_1_control_panel.html#a8b8b2ac320dec48f6dd2279628851c08">keyReleased</a>(KeyEvent e) {</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    }</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    }</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;}</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassfirebase_1_1_employee_html"><div class="ttname"><a href="classfirebase_1_1_employee.html">firebase.Employee</a></div><div class="ttdef"><b>Definition:</b> <a href="_employee_8java_source.html#l00007">Employee.java:7</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel_html"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html">GUI.panels.StreamingStatsReviewsPanel</a></div><div class="ttdef"><b>Definition:</b> <a href="_streaming_stats_reviews_panel_8java_source.html#l00021">StreamingStatsReviewsPanel.java:21</a></div></div>
+<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel_html"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html">GUI.panels.StreamingStatsReviewsPanel</a></div><div class="ttdef"><b>Definition:</b> <a href="_streaming_stats_reviews_panel_8java_source.html#l00019">StreamingStatsReviewsPanel.java:19</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1_utils_html_a037eb57e5e014796e6a6f13a2a05e5a6"><div class="ttname"><a href="class_g_u_i_1_1_utils.html#a037eb57e5e014796e6a6f13a2a05e5a6">GUI.Utils.retrieveReportsIDs</a></div><div class="ttdeci">void retrieveReportsIDs(Vector&lt; String &gt; pendingReportIDs, Vector&lt; String &gt; openReportIDs, Vector&lt; String &gt; closedReportIDs, DatabaseReference databaseReference, Semaphore semaphore, Vector&lt; ChatBidirectional &gt; chatInstances, ControlPanel controlPanel)</div><div class="ttdef"><b>Definition:</b> <a href="_utils_8java_source.html#l00142">Utils.java:142</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_stats_reports_panel_html"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_stats_reports_panel.html">GUI.panels.StatsReportsPanel</a></div><div class="ttdef"><b>Definition:</b> <a href="_stats_reports_panel_8java_source.html#l00021">StatsReportsPanel.java:21</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel_html_a6bbb65012dc06a4e88a80d10bd225b86"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html#a6bbb65012dc06a4e88a80d10bd225b86">GUI.panels.StreamingStatsReviewsPanel.loadStatsRecensioniStream</a></div><div class="ttdeci">void loadStatsRecensioniStream()</div><div class="ttdef"><b>Definition:</b> <a href="_streaming_stats_reviews_panel_8java_source.html#l00029">StreamingStatsReviewsPanel.java:29</a></div></div>
+<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel_html_a6bbb65012dc06a4e88a80d10bd225b86"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html#a6bbb65012dc06a4e88a80d10bd225b86">GUI.panels.StreamingStatsReviewsPanel.loadStatsRecensioniStream</a></div><div class="ttdeci">void loadStatsRecensioniStream()</div><div class="ttdef"><b>Definition:</b> <a href="_streaming_stats_reviews_panel_8java_source.html#l00045">StreamingStatsReviewsPanel.java:45</a></div></div>
 <div class="ttc" id="anamespace_g_u_i_1_1dialogs_html"><div class="ttname"><a href="namespace_g_u_i_1_1dialogs.html">GUI.dialogs</a></div><div class="ttdef"><b>Definition:</b> <a href="_chat_bidirectional_8java_source.html#l00001">ChatBidirectional.java:1</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_closed_reports_panel_html"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_closed_reports_panel.html">GUI.panels.ClosedReportsPanel</a></div><div class="ttdef"><b>Definition:</b> <a href="_closed_reports_panel_8java_source.html#l00017">ClosedReportsPanel.java:17</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_create_report_panel_html"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_create_report_panel.html">GUI.panels.CreateReportPanel</a></div><div class="ttdef"><b>Definition:</b> <a href="_create_report_panel_8java_source.html#l00013">CreateReportPanel.java:13</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_a8b8b2ac320dec48f6dd2279628851c08"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#a8b8b2ac320dec48f6dd2279628851c08">GUI.ControlPanel.keyReleased</a></div><div class="ttdeci">void keyReleased(KeyEvent e)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00184">ControlPanel.java:184</a></div></div>
+<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_create_report_panel_html"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_create_report_panel.html">GUI.panels.CreateReportPanel</a></div><div class="ttdef"><b>Definition:</b> <a href="_create_report_panel_8java_source.html#l00014">CreateReportPanel.java:14</a></div></div>
+<div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_a8b8b2ac320dec48f6dd2279628851c08"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#a8b8b2ac320dec48f6dd2279628851c08">GUI.ControlPanel.keyReleased</a></div><div class="ttdeci">void keyReleased(KeyEvent e)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00182">ControlPanel.java:182</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_pending_reports_panel_html_acdddcbcbc3cb3c361f4a8d5046148726"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_pending_reports_panel.html#acdddcbcbc3cb3c361f4a8d5046148726">GUI.panels.PendingReportsPanel.loadPendingReportsPanel</a></div><div class="ttdeci">void loadPendingReportsPanel(Vector&lt; String &gt; t_pendingReportIDs)</div><div class="ttdef"><b>Definition:</b> <a href="_pending_reports_panel_8java_source.html#l00086">PendingReportsPanel.java:86</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_create_report_panel_html_ab0737acb67f5db7908b953e30977dc89"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_create_report_panel.html#ab0737acb67f5db7908b953e30977dc89">GUI.panels.CreateReportPanel.loadCreateReportPanel</a></div><div class="ttdeci">void loadCreateReportPanel()</div><div class="ttdef"><b>Definition:</b> <a href="_create_report_panel_8java_source.html#l00049">CreateReportPanel.java:49</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_pending_reports_panel_html_a3d576cfb9c0a7d29c263efda3a3a43d1"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_pending_reports_panel.html#a3d576cfb9c0a7d29c263efda3a3a43d1">GUI.panels.PendingReportsPanel.updatePendingReportsPanel</a></div><div class="ttdeci">void updatePendingReportsPanel(Vector&lt; String &gt; t_newReports)</div><div class="ttdef"><b>Definition:</b> <a href="_pending_reports_panel_8java_source.html#l00065">PendingReportsPanel.java:65</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1_utils_html_a6fc34d3bfb3d1fcbffe0620145af39ad"><div class="ttname"><a href="class_g_u_i_1_1_utils.html#a6fc34d3bfb3d1fcbffe0620145af39ad">GUI.Utils.initialize</a></div><div class="ttdeci">void initialize(ControlPanel controlPanel)</div><div class="ttdef"><b>Definition:</b> <a href="_utils_8java_source.html#l00116">Utils.java:116</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_closed_reports_panel_html_a8e84217aaf34b586a667c31817e3c176"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_closed_reports_panel.html#a8e84217aaf34b586a667c31817e3c176">GUI.panels.ClosedReportsPanel.updateClosedReportsPanel</a></div><div class="ttdeci">void updateClosedReportsPanel(Vector&lt; String &gt; newClosedReportsIDs)</div><div class="ttdef"><b>Definition:</b> <a href="_closed_reports_panel_8java_source.html#l00060">ClosedReportsPanel.java:60</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1_utils_html_af7513d43c8d4f0f08499364ab76233fe"><div class="ttname"><a href="class_g_u_i_1_1_utils.html#af7513d43c8d4f0f08499364ab76233fe">GUI.Utils.setLayoutManager</a></div><div class="ttdeci">void setLayoutManager(Container container, CardLayout cardLayout, JPanel profilePanel, JPanel pendingReportPanel, JPanel openReportPanel, JPanel closedReportPanel, JPanel statsReviewsPanel, JPanel statsReportsPanel, JPanel createReportPanel, ControlPanel controlPanel)</div><div class="ttdef"><b>Definition:</b> <a href="_utils_8java_source.html#l00236">Utils.java:236</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_create_report_panel_html_a312811ed3b9d528485521ff7b6483a14"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_create_report_panel.html#a312811ed3b9d528485521ff7b6483a14">GUI.panels.CreateReportPanel.setEmployee</a></div><div class="ttdeci">void setEmployee(Employee loggedEmployee)</div><div class="ttdef"><b>Definition:</b> <a href="_create_report_panel_8java_source.html#l00257">CreateReportPanel.java:257</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_ac9cb454472bcf1e247f65adfd9fb67e9"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#ac9cb454472bcf1e247f65adfd9fb67e9">GUI.ControlPanel.keyTyped</a></div><div class="ttdeci">void keyTyped(KeyEvent e)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00179">ControlPanel.java:179</a></div></div>
+<div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_ac9cb454472bcf1e247f65adfd9fb67e9"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#ac9cb454472bcf1e247f65adfd9fb67e9">GUI.ControlPanel.keyTyped</a></div><div class="ttdeci">void keyTyped(KeyEvent e)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00177">ControlPanel.java:177</a></div></div>
 <div class="ttc" id="anamespace_g_u_i_1_1panels_html"><div class="ttname"><a href="namespace_g_u_i_1_1panels.html">GUI.panels</a></div><div class="ttdef"><b>Definition:</b> <a href="_closed_reports_panel_8java_source.html#l00001">ClosedReportsPanel.java:1</a></div></div>
 <div class="ttc" id="anamespacefirebase_html"><div class="ttname"><a href="namespacefirebase.html">firebase</a></div><div class="ttdef"><b>Definition:</b> <a href="_employee_8java_source.html#l00001">Employee.java:1</a></div></div>
 <div class="ttc" id="anamespace_g_u_i_html"><div class="ttname"><a href="namespace_g_u_i.html">GUI</a></div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00001">ControlPanel.java:1</a></div></div>
@@ -288,14 +284,15 @@ $(function() {
 <div class="ttc" id="aclass_g_u_i_1_1_utils_html_a30be886d4934c6608a99836cfe3965c5"><div class="ttname"><a href="class_g_u_i_1_1_utils.html#a30be886d4934c6608a99836cfe3965c5">GUI.Utils.initMenu</a></div><div class="ttdeci">void initMenu(CardLayout cardLayout, Container container, ControlPanel controlPanel)</div><div class="ttdef"><b>Definition:</b> <a href="_utils_8java_source.html#l00023">Utils.java:23</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_profile_panel_html_ac8c626fd4e27d52ee74094084daa643c"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_profile_panel.html#ac8c626fd4e27d52ee74094084daa643c">GUI.panels.ProfilePanel.loadProfilePanel</a></div><div class="ttdeci">void loadProfilePanel(Employee employee)</div><div class="ttdef"><b>Definition:</b> <a href="_profile_panel_8java_source.html#l00027">ProfilePanel.java:27</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_aac7169c576b6fc671aeec1f345bc2cb1"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#aac7169c576b6fc671aeec1f345bc2cb1">GUI.ControlPanel.ControlPanel</a></div><div class="ttdeci">ControlPanel(Employee loggedEmployee)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00063">ControlPanel.java:63</a></div></div>
+<div class="ttc" id="aclass_g_u_i_1_1panels_1_1_create_report_panel_html_a3b12079600caab7bf6631af39a9647b8"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_create_report_panel.html#a3b12079600caab7bf6631af39a9647b8">GUI.panels.CreateReportPanel.loadCreateReportPanel</a></div><div class="ttdeci">void loadCreateReportPanel(Employee loggedEmployee)</div><div class="ttdef"><b>Definition:</b> <a href="_create_report_panel_8java_source.html#l00074">CreateReportPanel.java:74</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_pending_reports_panel_html"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_pending_reports_panel.html">GUI.panels.PendingReportsPanel</a></div><div class="ttdef"><b>Definition:</b> <a href="_pending_reports_panel_8java_source.html#l00018">PendingReportsPanel.java:18</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1dialogs_1_1_chat_bidirectional_html"><div class="ttname"><a href="class_g_u_i_1_1dialogs_1_1_chat_bidirectional.html">GUI.dialogs.ChatBidirectional</a></div><div class="ttdef"><b>Definition:</b> <a href="_chat_bidirectional_8java_source.html#l00015">ChatBidirectional.java:15</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_closed_reports_panel_html_a4ce668bca135e09a42c896db2414e63f"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_closed_reports_panel.html#a4ce668bca135e09a42c896db2414e63f">GUI.panels.ClosedReportsPanel.loadClosedReportsPanel</a></div><div class="ttdeci">void loadClosedReportsPanel(Vector&lt; String &gt; t_closedReportsIDs)</div><div class="ttdef"><b>Definition:</b> <a href="_closed_reports_panel_8java_source.html#l00083">ClosedReportsPanel.java:83</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_open_reports_panel_html_aa9e12f88752891815bd815a43ff0846d"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_open_reports_panel.html#aa9e12f88752891815bd815a43ff0846d">GUI.panels.OpenReportsPanel.updateOpenReportsPanel</a></div><div class="ttdeci">void updateOpenReportsPanel(Vector&lt; String &gt; new_openReports, Vector&lt; ChatBidirectional &gt; chatInstances)</div><div class="ttdef"><b>Definition:</b> <a href="_open_reports_panel_8java_source.html#l00069">OpenReportsPanel.java:69</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_a78eeac2a78f06d6f53500d672603dac9"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#a78eeac2a78f06d6f53500d672603dac9">GUI.ControlPanel.setCardShowed</a></div><div class="ttdeci">void setCardShowed(int val)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00150">ControlPanel.java:150</a></div></div>
+<div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_a78eeac2a78f06d6f53500d672603dac9"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#a78eeac2a78f06d6f53500d672603dac9">GUI.ControlPanel.setCardShowed</a></div><div class="ttdeci">void setCardShowed(int val)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00148">ControlPanel.java:148</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_open_reports_panel_html_a5e678c844c3d3f233c0a9df3edd4bb0d"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_open_reports_panel.html#a5e678c844c3d3f233c0a9df3edd4bb0d">GUI.panels.OpenReportsPanel.loadOpenReportsPanel</a></div><div class="ttdeci">void loadOpenReportsPanel(Vector&lt; String &gt; openReportIDs, Vector&lt; ChatBidirectional &gt; chatInstances, Employee employee)</div><div class="ttdef"><b>Definition:</b> <a href="_open_reports_panel_8java_source.html#l00095">OpenReportsPanel.java:95</a></div></div>
 <div class="ttc" id="aclass_g_u_i_1_1panels_1_1_open_reports_panel_html"><div class="ttname"><a href="class_g_u_i_1_1panels_1_1_open_reports_panel.html">GUI.panels.OpenReportsPanel</a></div><div class="ttdef"><b>Definition:</b> <a href="_open_reports_panel_8java_source.html#l00021">OpenReportsPanel.java:21</a></div></div>
-<div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_a5c1b55526f114eac4b0f506f924f415f"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#a5c1b55526f114eac4b0f506f924f415f">GUI.ControlPanel.keyPressed</a></div><div class="ttdeci">void keyPressed(KeyEvent e)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00161">ControlPanel.java:161</a></div></div>
+<div class="ttc" id="aclass_g_u_i_1_1_control_panel_html_a5c1b55526f114eac4b0f506f924f415f"><div class="ttname"><a href="class_g_u_i_1_1_control_panel.html#a5c1b55526f114eac4b0f506f924f415f">GUI.ControlPanel.keyPressed</a></div><div class="ttdeci">void keyPressed(KeyEvent e)</div><div class="ttdef"><b>Definition:</b> <a href="_control_panel_8java_source.html#l00159">ControlPanel.java:159</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

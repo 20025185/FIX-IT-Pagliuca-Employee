@@ -10,50 +10,75 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Objects;
 
+@SuppressWarnings("JavaDoc")
 public class CreateReportPanel extends JPanel {
+    //  JTextField per impostare l'oggetto della segnalazione
     private final JLabel oggettoLabel = new JLabel("Oggetto");
     private final JTextField oggettoReport = new JTextField();
+
+    //  JSpinner per selezionare la data e ora della segnalazione
     private final JLabel dataLabel = new JLabel("Data");
-    private final JLabel coordLabel = new JLabel("Posizione");
-    private final JTextField coordReport = new JTextField("coord_x, coord_y");
     private final SpinnerDateModel timeModel = new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY);
     private JSpinner timeReport = new JSpinner(timeModel);
 
+    //  JTextField per impostare le coordinate della segnalazione.
+    private final JLabel coordLabel = new JLabel("Posizione");
+    private final JTextField coordReport = new JTextField("coord_x, coord_y");
+
+    //  ButtonGroup per selezionare la priorità della segnalazione
     private final JLabel priorityLabel = new JLabel("Priorità");
+    private final ButtonGroup priorities = new ButtonGroup();
     private final JRadioButton lowPriority = new JRadioButton("Bassa");
     private final JRadioButton mediumPriority = new JRadioButton("Media");
     private final JRadioButton highPriority = new JRadioButton("Alta");
-    private final ButtonGroup priorities = new ButtonGroup();
+
+    //  JComboBox per selezionare lo status della segnalazione
     private final JLabel statusLabel = new JLabel("Status");
     private final String[] statusOptions = {"Aperta", "Chiusa", "Pending"};
     private final JComboBox<String> statusBox = new JComboBox<>(statusOptions);
+
+    //  JComboBox per selezionare la tipologia della segnalazione
     private final JLabel issuesLabel = new JLabel("Tipologia problematica");
     private final String[] issuesOptions = {"Problematica di origine naturale", "Problematica stradale", "Attività sospette", "Altro"};
     private final JComboBox<String> issuesBox = new JComboBox<>(issuesOptions);
 
+    //  JCheckBoxMenuItem che rappresenta il booleano per la diffusione su social
     private final JLabel socialLabel = new JLabel("Social");
     private final JCheckBoxMenuItem socialReport = new JCheckBoxMenuItem();
+
+    //  JTextArea compilabile nella descrizione del report.
     private final JTextArea descReport = new JTextArea();
+
+    //  JLabel che indica la descrizione del report.
     private final JLabel descLabel = new JLabel("Descrizione");
+
+    //  JButton per inviare la segnalazione sul RTD.
     private final JButton sendBtn = new JButton("Invia segnalazione");
+
+    //  JButton per resettare i campi.
     private final JButton resetBtn = new JButton("Reset");
+
     private String time;
     private String date;
 
-    private final DatabaseReference databaseReference = FirebaseDatabase
-            .getInstance()
-            .getReference("reports");
+    //  Riferimento al database partendo dal nodo "reports"
+    private final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("reports");
 
-    private Employee loggedEmploye;
+    //  Impiegato loggato, viene passato come parametro nella funzione di loading
+    private Employee loggedEmployee;
 
-    public void loadCreateReportPanel() {
+    /***
+     * Metodo che chiamando un altro metodo loadItems() carica i componenti all'interno del JPanel, successivamente vengono anche definiti i listeners
+     * per il JButton "sendBtn" che invierà e creerà il metodo sul Real Time Database di Firebase, e per il JButton "resetBtn" che si occuperà del reset dei campi.
+     */
+    public void loadCreateReportPanel(Employee loggedEmployee) {
         loadItems();
-
+        this.loggedEmployee = loggedEmployee;
         sendBtn.addActionListener(e -> {
             if (checkCampi()) {
                 String repId = databaseReference.push().getKey();
                 Report report = new Report(repId,
-                        loggedEmploye.getUid(),
+                        this.loggedEmployee.getUid(),
                         oggettoReport.getText(),
                         descReport.getText(),
                         date,
@@ -61,7 +86,7 @@ public class CreateReportPanel extends JPanel {
                         Objects.requireNonNull(issuesBox.getSelectedItem()).toString(),
                         coordReport.getText().replace(",", " "),
                         parsePriority(Objects.requireNonNull(getSelectedPriority())),
-                        Objects.requireNonNull(statusBox.getSelectedItem()).toString() + "_" + loggedEmploye.getUid(),
+                        Objects.requireNonNull(statusBox.getSelectedItem()).toString() + "_" + this.loggedEmployee.getUid(),
                         socialReport.getState()
                 );
                 databaseReference.child(repId).setValueAsync(report);
@@ -82,21 +107,12 @@ public class CreateReportPanel extends JPanel {
         });
     }
 
-    private String parsePriority(String selectedPriority) {
-        switch (selectedPriority) {
-            case "Alta":
-                return "2";
-            case "Media":
-                return "1";
-            case "Bassa":
-                return "0";
-        }
-        return selectedPriority;
-    }
-
+    /***
+     * Metodo che restituisce la priorità selezionata selezionata sui RadioButtons
+     * @return
+     */
     private String getSelectedPriority() {
-        for (Enumeration<AbstractButton> buttons = priorities.getElements();
-             buttons.hasMoreElements(); ) {
+        for (Enumeration<AbstractButton> buttons = priorities.getElements(); buttons.hasMoreElements(); ) {
             AbstractButton button = buttons.nextElement();
             if (button.isSelected()) {
                 return button.getText();
@@ -105,6 +121,10 @@ public class CreateReportPanel extends JPanel {
         return null;
     }
 
+    /***
+     * Metodo che effetua il parsing della data e tempo per ottenere la formattazione desiderata.
+     * @param dateAndTime
+     */
     private void parseTimeAndDate(JSpinner dateAndTime) {
         final String toParse = dateAndTime.getValue().toString();
         final int indexColumns = toParse.indexOf(":");
@@ -159,11 +179,17 @@ public class CreateReportPanel extends JPanel {
         date += year;
     }
 
+    /***
+     * Metodo ausiliario che effettua il controllo e la verifica chet tutti i campi compilabili per la segnalazioni rispettino
+     * le regole di formattazione per mandare una segnalazione "sensata".
+     * @return
+     */
     private boolean checkCampi() {
         parseTimeAndDate(timeReport);
         if (!time.isEmpty() && !date.isEmpty()) {
             if (!oggettoReport.getText().isEmpty()) {
                 if (!descReport.getText().isEmpty()) {
+                    //noinspection RegExpDuplicateCharacterInClass
                     if (!coordReport.getText().isEmpty() &&
                             coordReport.getText().matches("[- 0-9*.0-9*],[- 0-9*.0-9*]")) {
                         if (getSelectedPriority() != null) {
@@ -196,6 +222,10 @@ public class CreateReportPanel extends JPanel {
 
         return false;
     }
+
+    /***
+     * Metodo ausiliario che carica gli oggetti sul pannello
+     */
 
     private void loadItems() {
         this.setLayout(null);
@@ -254,7 +284,21 @@ public class CreateReportPanel extends JPanel {
         this.add(resetBtn);
     }
 
-    public void setEmployee(Employee loggedEmployee) {
-        this.loggedEmploye = loggedEmployee;
+    /***
+     * Metodo ausiliario che effettua il parsing della priorità restituendo una stringa che corrisponde al codice della priorità letta.
+     * @param selectedPriority
+     * @return
+     */
+    private String parsePriority(String selectedPriority) {
+        switch (selectedPriority) {
+            case "Alta":
+                return "2";
+            case "Media":
+                return "1";
+            case "Bassa":
+                return "0";
+        }
+        return selectedPriority;
     }
+
 }

@@ -16,14 +16,26 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 public class Consumer {
+    //  Membro contenente il topic in cui si metterà a consumer
     private final String topic;
+
+    //  Logger per stampare le operazioni importanti
     private final Logger logger = LoggerFactory.getLogger(Consumer.class.getName());
+
+    //  HashaMap che memorizza
     private final HashMap<String, String> recordKeysAndValues = new HashMap<>();
 
+    /***
+     * Costruttore che salva all'interno del membro "topic" il topic passato in ingresso.
+     * @param topic
+     */
     public Consumer(String topic) {
         this.topic = topic;
     }
 
+    /***
+     * Metodo pubblico che viene lanciato sul Consumer, questo metodo crea un ConsumerRunnable che verrà eseguito da un thread.
+     */
     public void run() {
         CountDownLatch latch = new CountDownLatch(1);
         logger.info("Creating the consumer thread");
@@ -36,8 +48,7 @@ public class Consumer {
         thread.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            //logger.info("Caught shutdown hook.");
-
+            logger.info("Caught shutdown hook.");
             myConsumerRunnable.shutdown();
 
             try {
@@ -46,15 +57,22 @@ public class Consumer {
                 e.printStackTrace();
             }
 
-            //logger.info("Application has exited");
+            logger.info("Application has exited");
         }));
-
     }
 
+    /***
+     * Getter che restituisce l'HashMap contenente i log del topic.
+     * @return
+     */
     public HashMap<String, String> getRecordKeysAndValues() {
         return recordKeysAndValues;
     }
 
+    /***
+     * Classe ConsumerRunnable che fa parte della classe Consumer, essa eredita la classe Runnable, quindi è effettivamente
+     * un Runnable ed è possibile effettuare l'override del metodo .run()
+     */
     public class ConsumerRunnable implements Runnable {
         private final CountDownLatch latch;
         private final KafkaConsumer<String, String> consumer;
@@ -72,25 +90,16 @@ public class Consumer {
             }
         }
 
-        public Properties getConsumerConfig() {
-            Properties config = new Properties();
-            config.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-            config.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-            config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-            String groupId = "fix-it-employee-app";
-            config.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-            config.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");    //  latest, none
 
-            return config;
-        }
-
+        /***
+         * Metodo che salva i record del topic in lettura all'interno della HashMap
+         */
         @Override
         public void run() {
             try {
                 //noinspection InfiniteLoopStatement
                 while (true) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-
                     for (ConsumerRecord<String, String> record : records) {
                         logger.info("Key: " + record.key() + ", Value: " + record.value());
                         logger.info("Partition; " + record.partition() + ", Offset: " + record.offset());
@@ -106,8 +115,32 @@ public class Consumer {
             }
         }
 
-        public void shutdown() {
-            consumer.wakeup();  //  Interrupt the .poll(), it will throw the WakeUpException
+        /***
+         * Chiama la wakeup() sul consumatore, ovvero interrompe il metodo .poll() ed è in grado di generare WakeUpException
+         */
+        private void shutdown() {
+            consumer.wakeup();
+        }
+
+        /***
+         * Metodo ausiliario che crea le configurazioni per il consumatore e le restituisce.
+         *      -   Server Kafka
+         *      -   Key Deserializer per le Stringhe
+         *      -   Value Deserializer per le Stringhe
+         *      -   Value Deserializer per le Stringhe
+         *      -   Nome del group-id
+         *      -   AutoOffsetResetConfig, "latest" viene letto l'ultimo log presente all'interno del topic.
+         * @return
+         */
+        private Properties getConsumerConfig() {
+            Properties config = new Properties();
+            config.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+            config.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+            config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+            config.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "fix-it-employee-app");
+            config.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+            return config;
         }
     }
 }

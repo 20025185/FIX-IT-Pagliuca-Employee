@@ -2,7 +2,6 @@ package GUI.panels;
 
 import kafka.members.Consumer;
 import kafka.streams.FixItStream;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -11,21 +10,38 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
 import java.awt.*;
-
 import java.util.HashMap;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("JavaDoc")
 public class StreamingStatsReviewsPanel extends JPanel {
-    private HashMap<String, String> stringStringHashMap = new HashMap<>();
+    //  HashMap contenente i log <Key,Value> tali che contengano la tipologia della recensione nella chiave e il numero di recensioni nel value
+    private HashMap<String, String> favReviewsHashMap = new HashMap<>();
+
+    //  Grafo della libreria JFreeChart
     private JFreeChart chart;
+
+    //  ChartPanel per spostare il grafo su un oggetto simile a JPanel
     private ChartPanel chartPanel;
+
+    //  Oggetto per effettuare il plotting
     private CategoryPlot plot;
+
+    //  Dataset per effettuare il plot
     private final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+    //  Valori per ogni tipo di segnalazione
     private int naturalVal = 0, stradaleVal = 0, sospetteVal = 0, altroVal = 0;
 
+    /***
+     * Metodo che crea uno Stream sul topic "input-ratings" e crea un consumer sul topic "count-fav-issues".
+     * Nel runnable si continua a ricevere un HashMap aggiornata dei valori dal consumer.
+     * successivamente si estraggono i valori e li si mettono all'interno del dataset successivamente vengono elaborati e
+     * plottati sul grafo, avendo così un grafo che è aggiornato i log ricevuti dal topic che subisce il processamento dal KafkaStream
+     * "favReviewStream".
+     */
     public void loadStatsRecensioniStream() {
         FixItStream favReviewStream = new FixItStream("input-ratings");
         favReviewStream.execute();
@@ -38,9 +54,9 @@ public class StreamingStatsReviewsPanel extends JPanel {
         initializeChartBar();
 
         Runnable r = () -> {
-            stringStringHashMap = consumerFavReview.getRecordKeysAndValues();
+            favReviewsHashMap = consumerFavReview.getRecordKeysAndValues();
 
-            parseValueAndKeys(stringStringHashMap);
+            parseValueAndKeys(favReviewsHashMap);
 
             dataset.setValue(naturalVal,
                     "Problematica di origine naturale",
@@ -79,9 +95,10 @@ public class StreamingStatsReviewsPanel extends JPanel {
         this.setBackground(Color.WHITE);
     }
 
-
     /***
-     *
+     * Metodo che effettua il parsing dei valori contenuti all'interno dell'HashMap passata come parametro,
+     * dopo aver effettuato questo parsing essendo entrambi i valori di tipo string si effettua un altro parse ma stavolta con il metodo
+     * della classe involucro Integer, ed i valori vengono smistati per tipologia nelle rispettive variabili.
      * @param hm
      */
     private void parseValueAndKeys(HashMap<String, String> hm) {

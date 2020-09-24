@@ -1,11 +1,6 @@
 <map id="GUI.dialogs.EditReportFrame.EditReportFrame" name="GUI.dialogs.EditReportFrame.EditReportFrame">
-<area shape="rect" id="node1" title=" " alt="" coords="5,175,200,217"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,49,200,90"/>
 <area shape="rect" id="node2" href="$classfirebase_1_1_report.html#ad3decf21116b5075cf19f53d32341199" title=" " alt="" coords="263,5,405,32"/>
 <area shape="rect" id="node3" href="$classfirebase_1_1_report.html#a25381714859e7b7b73e94269444cbcdb" title=" " alt="" coords="249,56,419,83"/>
 <area shape="rect" id="node4" href="$classfirebase_1_1_report.html#ab195444f482fbe378be0dbf48671d007" title=" " alt="" coords="248,107,420,133"/>
-<area shape="rect" id="node5" href="$classfirebase_1_1_report.html#abfd6564b7f889807f037e9e30224ad99" title=" " alt="" coords="249,157,419,184"/>
-<area shape="rect" id="node6" href="$classfirebase_1_1_report.html#a13d62bfb74fe3b779be28b87edca03cd" title=" " alt="" coords="259,208,409,235"/>
-<area shape="rect" id="node7" href="$classfirebase_1_1_report.html#a33a5731e46a0f3e4e556ddf2ed2dd6f2" title=" " alt="" coords="249,259,419,285"/>
-<area shape="rect" id="node8" href="$classfirebase_1_1_report.html#a9e9fe0344249ac0604b4326eff39873f" title=" " alt="" coords="248,309,420,336"/>
-<area shape="rect" id="node9" href="$classfirebase_1_1_report.html#a70d051b079e3796db75a6770bc3253f3" title=" " alt="" coords="249,360,419,387"/>
 </map>
