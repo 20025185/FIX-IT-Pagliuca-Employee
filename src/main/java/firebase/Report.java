@@ -2,7 +2,6 @@ package firebase;
 
 /***
  * Classe che mappa una segnalazione presente sul Real Time Database di Firebase in un oggetto Java.
- *
  */
 
 @SuppressWarnings("ALL")

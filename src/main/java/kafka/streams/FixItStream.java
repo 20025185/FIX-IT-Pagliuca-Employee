@@ -16,20 +16,35 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+@SuppressWarnings("JavaDoc")
 public class FixItStream {
+    //  Topic fornito in ingresso al costruttore.
     private final String sourceTopic;
+
+    //  StreamsBuilder per la costruzione di uno KStream (o nel caso di una KTable) con il topic fornito in ingresso.
     private final StreamsBuilder builder;
+
+    //  Oggetto di configurazione per lo streaming.
     private final Properties config;
 
+    //  Oggetto che permette di stampare i Log del server di Apache Kafka.
     private final Logger logger = LoggerFactory.getLogger(FixItStream.class.getName());
 
+    /***
+     * Costruttore, imposta il topic da cui verrà avviato lo stream.
+     * Genera lo StreamsBuilder() e crea le configurazioni da utilizzare con il metodo getStreamProperties().
+     * @param topic
+     */
     public FixItStream(String topic) {
         this.sourceTopic = topic;
         builder = new StreamsBuilder();
         config = getStreamProperties();
-
     }
 
+    /***
+     * Metodo che effettua un operazione di selezione, in base ad uno dei topic (che deve essere ovviamente presente sul
+     * sistema di Apache Kafka) chiama una funzione differente per fare delle operazioni differenti.
+     */
     public void execute() {
         switch (sourceTopic) {
             case "input-ratings":
@@ -44,6 +59,18 @@ public class FixItStream {
         }
     }
 
+    /***
+     * Metodo che viene chiamatop quando il topic passato come parametro nel costruttore è "input-ratings".
+     * Si riceve i dati all'interno di una KStream, successivamente vengono passati all'interno di un altra KStream
+     * di nome "favStream" alla quale vengono effettuati dei processamenti :
+     *      -   Operazione di filtering utilizzando la funzione di callback checkRating(), si fanno passare solo i report che hanno un rating >= 4.0
+     *      -   Mappaggio della chiave del topic con la funzione retrieveIssueType(), in più si effettua un toLowerCase() per assicurarsi che tutti i
+     *          caratteri siano uguali in caso di matching futuri.
+     *      -   Mappaggio dei valori con la funzione di callback getRating() che restituisce il valore del report.
+     *
+     * In fine questo nuovo log dopo essere passato in questi tre nodi di processamento viene tutti inviato ad un nodo in uscita
+     * (sink) sul topic "fav-issues-filter", per un totale di 5 nodi di processamento (contando anche il nodo di source).
+     */
     private void input_ratingsStreaming() {
         KStream<String, String> inputStream = builder.stream("input-ratings");
 
@@ -73,6 +100,16 @@ public class FixItStream {
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
     }
 
+    /***
+     * Funzione ausiliaria che setta l'oggetto di tipo Properties con tutte le impostazioni per rendere lo stream
+     * utile per lo scopo.
+     *      -   Nome dell'id dell'applicazione
+     *      -   Indirizzo broker
+     *      -   Key Serializer/Deserializer
+     *      -   Value Serializer/Deserializer
+     *      -   Auto_Offset_Reset_Config -> I log vengono letti dal più recente.
+     * @return
+     */
     private Properties getStreamProperties() {
         final Properties props = new Properties();
 
@@ -86,6 +123,11 @@ public class FixItStream {
         return props;
     }
 
+    /***
+     *  Funzione di callback che restituisce il valore della recensione nella segnalazione rappresentata da un oggetto Json.
+     * @param valueJsn
+     * @return
+     */
     private String getRating(String valueJsn) {
         final int RATING_JSON_INDEX = 6;
 
@@ -107,6 +149,12 @@ public class FixItStream {
         return Double.toString(val);
     }
 
+    /***
+     * Metodo Callback utilizzato per restituire un tag rappresentate il tipo della segnalazione, questo perchè restituire
+     * esattamente la stringa del tipo potrebbe risultare in svariate complicanze in fase di matching (es. se si perde un carattere).
+     * @param valueJsn
+     * @return
+     */
     private String retrieveIssueType(String valueJsn) {
         final int RATING_JSON_INDEX = 10;
 
@@ -125,17 +173,23 @@ public class FixItStream {
 
         switch (finalStr) {
             case "Problematica Stradale":
-                return "STRADALE";
+                return "stradale";
             case "Problematica di origine naturale":
-                return "NATURALE";
+                return "naturale";
             case "Attività sospette":
-                return "SOSPETTE";
+                return "sospette";
             case "Altro":
-                return "ALTRO";
+                return "altro";
         }
-        return "UNDEFINED";
+        return "undefined";
     }
 
+    /***
+     * Funzione Callback utilizzata per effettuare il filtering delle segnalazioni, vengono fatte passare
+     * soltanto le segnalazioni che hanno una recensione >= 4.0
+     * @param valueJson
+     * @return
+     */
     private boolean checkRating(String valueJson) {
         if (valueJson.contains("rating")) {
             int start = valueJson.indexOf("rating") + 9;

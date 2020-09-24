@@ -50,7 +50,7 @@ public class ControlPanel extends JFrame implements KeyListener {
      *      #Dinamici   :  Sono i pannell che necessitano di un costante aggiornamento dei reports per effettuare le operazioni su di essi, per esempio
      *                  il pannello dei record in attesa.
      *
-     *  dynamicPanels ->    Si occupa di fornire alle funzioni di aggiornamento dei vari panels dinamici, il rispettivo vettore dei record che è stato aggiornato
+     *  dynamicPanels -    Si occupa di fornire alle funzioni di aggiornamento dei vari panels dinamici, il rispettivo vettore dei record che è stato aggiornato
      *                      precedentemente con il metodo retrieveReportIDs().
      *
      *  Per la gestione di tutti i pannelli si utilizza un CardLayout, la gestione di questo layout è stata lasciata alla classe Utils.java per non rendere ulteriormente

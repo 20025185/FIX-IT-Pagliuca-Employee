@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['scrollpane_544',['scrollPane',['../class_g_u_i_1_1dialogs_1_1_chat_bidirectional.html#af2796648da80f55e2fe1a88e6d77a66a',1,'GUI::dialogs::ChatBidirectional']]],
+  ['semaphore_545',['semaphore',['../class_g_u_i_1_1_control_panel.html#ae9e616bc9c335fd28c9154239f59c77b',1,'GUI::ControlPanel']]],
+  ['semaphore1_546',['semaphore1',['../class_g_u_i_1_1dialogs_1_1_chat_bidirectional.html#a3be258bbc9a8ce01d79b2f8850c89151',1,'GUI::dialogs::ChatBidirectional']]],
+  ['sendbtn_547',['sendBtn',['../class_g_u_i_1_1panels_1_1_create_report_panel.html#acd8c60d90a41e911439b330639ef1ebf',1,'GUI::panels::CreateReportPanel']]],
+  ['sendbutton_548',['sendButton',['../class_g_u_i_1_1dialogs_1_1_chat_bidirectional.html#a7a5d8b923112bb20f744b3c523a00984',1,'GUI::dialogs::ChatBidirectional']]],
+  ['singleclosedreport_549',['singleClosedReport',['../class_g_u_i_1_1panels_1_1_closed_reports_panel.html#a1d0e8cd84eac26df44c1c79fcd6bf3c1',1,'GUI::panels::ClosedReportsPanel']]],
+  ['singleopenreport_550',['singleOpenReport',['../class_g_u_i_1_1panels_1_1_open_reports_panel.html#a25f013d397d3171e1146fa39bfd14e8c',1,'GUI::panels::OpenReportsPanel']]],
+  ['singlependingreport_551',['singlePendingReport',['../class_g_u_i_1_1panels_1_1_pending_reports_panel.html#a8c5ce94f4eec32af4dc09bdd1ffdfa08',1,'GUI::panels::PendingReportsPanel']]],
+  ['social_552',['social',['../classfirebase_1_1_report.html#ac3a07f85f69045e619d610fe9fc2d6e1',1,'firebase::Report']]],
+  ['sociallabel_553',['socialLabel',['../class_g_u_i_1_1panels_1_1_create_report_panel.html#a546e9be827be3e37493924bfbcf040e2',1,'GUI::panels::CreateReportPanel']]],
+  ['socialreport_554',['socialReport',['../class_g_u_i_1_1panels_1_1_create_report_panel.html#a0cffffa1824da4072f0583143a0066bc',1,'GUI::panels::CreateReportPanel']]],
+  ['sospetteval_555',['sospetteVal',['../class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html#a6b4aa08be318cbaf18dde55bd3722e0b',1,'GUI::panels::StreamingStatsReviewsPanel']]],
+  ['sourcetopic_556',['sourceTopic',['../classkafka_1_1streams_1_1_fix_it_stream.html#a2bbfc7b8203b064838b05f552fa9316c',1,'kafka::streams::FixItStream']]],
+  ['splitpane_557',['splitPane',['../class_g_u_i_1_1panels_1_1_closed_reports_panel.html#aded2d7a1d91ced690d503e2ee544d344',1,'GUI::panels::ClosedReportsPanel']]],
+  ['statsreportspanel_558',['statsReportsPanel',['../class_g_u_i_1_1_control_panel.html#aca8ce7fc46d0661ca17ee63f8996c530',1,'GUI::ControlPanel']]],
+  ['status_559',['status',['../classfirebase_1_1_report.html#a9f043aacfa3eacdaa86f5b118bcec870',1,'firebase.Report.status()'],['../class_g_u_i_1_1dialogs_1_1_edit_report_frame.html#aae65c17228d7bb9f5089a83e7f173343',1,'GUI.dialogs.EditReportFrame.status()']]],
+  ['statusbox_560',['statusBox',['../class_g_u_i_1_1panels_1_1_create_report_panel.html#af8d7a825183ce8f4020a9f4270cd6720',1,'GUI::panels::CreateReportPanel']]],
+  ['statuslabel_561',['statusLabel',['../class_g_u_i_1_1panels_1_1_create_report_panel.html#ac91f5b834f6eef586c811598859696bd',1,'GUI::panels::CreateReportPanel']]],
+  ['statusoptions_562',['statusOptions',['../class_g_u_i_1_1panels_1_1_create_report_panel.html#ac1b3dd5bf81f60dccc1f2987bb24b3e0',1,'GUI::panels::CreateReportPanel']]],
+  ['stradaleval_563',['stradaleVal',['../class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html#a536fd2a9d2a96392a1daf4436cac45c7',1,'GUI::panels::StreamingStatsReviewsPanel']]],
+  ['streamingstatsreviewspanel_564',['streamingStatsReviewsPanel',['../class_g_u_i_1_1_control_panel.html#a9b155e336a46954c40889c412c05eea9',1,'GUI::ControlPanel']]],
+  ['stringstringhashmap_565',['stringStringHashMap',['../class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html#a680db13384328602d882e540c499b9fd',1,'GUI::panels::StreamingStatsReviewsPanel']]],
+  ['submitstatusbtn_566',['submitStatusBtn',['../class_g_u_i_1_1panels_1_1_open_reports_panel.html#a9dbfcddb97449ff44c46351f0424eb3a',1,'GUI::panels::OpenReportsPanel']]],
+  ['surname_567',['surname',['../classfirebase_1_1_employee.html#ad9ebd9aea0cbb5244f87494c556497fe',1,'firebase.Employee.surname()'],['../class_g_u_i_1_1dialogs_1_1_chat_bidirectional.html#ac419d17f3b72c0fdca016b4e8bdddfa1',1,'GUI.dialogs.ChatBidirectional.surname()']]]
+];

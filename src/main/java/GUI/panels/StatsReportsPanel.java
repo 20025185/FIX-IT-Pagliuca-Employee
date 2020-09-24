@@ -17,11 +17,21 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
+@SuppressWarnings("JavaDoc")
 public class StatsReportsPanel extends JPanel {
+    //  Pannello che contiene il grafico.
     private ChartPanel chartPanel = null;
+
+    //  TreeMap, è un HashMap che risulta già ordinata rispetto le chiavi (ovvero le date delle segnalazioni).
     private TreeMap<String, Integer> datesAndCount;
-    private final ArrayList<String> usersUID = new ArrayList<>();
-    private final ArrayList<String> activeUsers = new ArrayList<>();
+
+    //  Lista contenente gli UID tutti gli utenti.
+    private final ArrayList<String> wholeUsersList = new ArrayList<>();
+
+    //  Lista contenente gli UID tutti gli utenti attivi.
+    private final ArrayList<String> activeUsersList = new ArrayList<>();
+
+    //  Intero contenente il numero degli utenti non attivi.
     private int nonActiveUsers;
 
     /***
@@ -56,7 +66,7 @@ public class StatsReportsPanel extends JPanel {
                     retrievePricesOfReportsSimulation();
                     break;
                 case "Utenti attivi":
-                    retrieveUsersData();
+                    retrieveUserStats();
                     break;
             }
         });
@@ -66,31 +76,36 @@ public class StatsReportsPanel extends JPanel {
     }
 
     /***
+     * Metodo che calcola le informazion i a riguardo degli utenti attivi e non attivi, e le salva all'interno delle
+     * rispettiva variabili "activeUsersList" e "nonActiveUsers".
+     * Dove la prima variabile è un ArrayList contenente gli utenti attivi, mentre la seconda è una variabile che si ottiene
+     * effettuando la sottrazione fra le dimensione della lista completa di tutti gli users "wholeUsersList" e quella degli
+     * users attivi precedentemente calcolata "activeUsersList".
      *
+     * Per utente attivo si intende un utente che ha effettuato almeno una segnalazione.
      */
-    private void retrieveUsersData() {
+    private void retrieveUserStats() {
         if (chartPanel != null)
             this.remove(chartPanel);
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        datesAndCount = new TreeMap<>();
         Semaphore semaphore = new Semaphore(0);
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot d : dataSnapshot.child("users").getChildren()) {
-                    usersUID.add(d.getKey());
+                    wholeUsersList.add(d.getKey());
                 }
 
                 for (DataSnapshot d : dataSnapshot.child("reports").getChildren()) {
-                    if (usersUID.contains(d.child("uid").getValue().toString())) {
-                        int activeUserIndex = usersUID.indexOf(d.child("uid").getValue().toString());
-                        activeUsers.add(usersUID.get(activeUserIndex));
+                    if (wholeUsersList.contains(d.child("uid").getValue().toString())) {
+                        int activeUserIndex = wholeUsersList.indexOf(d.child("uid").getValue().toString());
+                        activeUsersList.add(wholeUsersList.get(activeUserIndex));
                     }
                 }
 
-                nonActiveUsers = usersUID.size() - activeUsers.size();
+                nonActiveUsers = wholeUsersList.size() - activeUsersList.size();
                 semaphore.release();
             }
 
@@ -107,7 +122,7 @@ public class StatsReportsPanel extends JPanel {
         }
 
         DefaultPieDataset dataset = new DefaultPieDataset();
-        dataset.setValue("Utenti attivi (che hanno almeno effettuato una segnalazione)", activeUsers.size());
+        dataset.setValue("Utenti attivi (che hanno almeno effettuato una segnalazione)", activeUsersList.size());
         dataset.setValue("Utenti non attivi", nonActiveUsers);
 
         JFreeChart chart = ChartFactory.createPieChart("Suddivisione dell'utenza", dataset, true, true, false);
@@ -124,6 +139,9 @@ public class StatsReportsPanel extends JPanel {
         this.add(chartPanel);
     }
 
+    /***
+     * Metodo che simula il costo di riparazione per la risoluzione di alcune segnalazioni.
+     */
     private void retrievePricesOfReportsSimulation() {
         if (chartPanel != null)
             this.remove(chartPanel);
@@ -148,81 +166,12 @@ public class StatsReportsPanel extends JPanel {
         this.add(chartPanel);
     }
 
-    private void RetrievePriorityReportsData(String priority) {
-        if (chartPanel != null)
-            this.remove(chartPanel);
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("reports");
-        Semaphore semaphore = new Semaphore(0);
-        datesAndCount = new TreeMap<>();
-
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    if (dataSnapshot1.child("priority").getValue().toString().equals(priority)) {
-                        final String date = dataSnapshot1.child("date").getValue().toString();
-
-                        if (datesAndCount.containsKey(date)) {
-                            int val = datesAndCount.get(date);
-                            ++val;
-                            datesAndCount.put(date, val);
-                        } else {
-                            datesAndCount.put(date, 1);
-                        }
-                    }
-                }
-                semaphore.release();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        try {
-            semaphore.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(datesAndCount.toString());
-
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        for (Map.Entry<String, Integer> entry : datesAndCount.entrySet()) {
-            dataset.setValue(entry.getValue(), "Affluenza segnalazioni", entry.getKey());
-        }
-
-        String title = "";
-        switch (priority) {
-            case "0":
-                title = "Statistiche segnalazioni con bassa priorità";
-                break;
-            case "1":
-                title = "Statistiche segnalazioni con media priorità";
-                break;
-            case "2":
-                title = "Statistiche segnalazioni con alta priorità";
-                break;
-        }
-
-        JFreeChart chart = ChartFactory.createLineChart(title, "Giorni", "Numero di segnalazioni", dataset);
-
-        CategoryPlot p = chart.getCategoryPlot();
-        p.setRangeGridlinePaint(Color.BLUE);
-
-        chartPanel = new ChartPanel(chart);
-        chartConfig();
-
-        this.repaint();
-        this.revalidate();
-        this.add(chartPanel);
-    }
-
     /***
-     * 
+     * Metodo che si occupa di scaricare di aggiornare una TreeMap contenente le date della segnalazione ed il corrispondente
+     * numero di segnalazioni avvenute quel giorno.
+     * La TreeMap si chiama "datesAndCount".
+     *
+     * Il metodo si occuperà di incrementare una occorrenza già presente nella TreeMap o di inizializzarla (quindi con un valore pari a 1).
      */
     private void retrieveAllReportsData() {
         if (chartPanel != null)
@@ -269,7 +218,8 @@ public class StatsReportsPanel extends JPanel {
             dataset.setValue(entry.getValue(), "Affluenza segnalazioni", entry.getKey());
         }
 
-        JFreeChart chart = ChartFactory.createLineChart("Comportamento di tutte le segnalazioni sulla piattaforma", "Giorni", "Numero di segnalazioni", dataset);
+        JFreeChart chart = ChartFactory.createLineChart("Comportamento di tutte le segnalazioni sulla piattaforma",
+                "Giorni", "Numero di segnalazioni", dataset);
 
         CategoryPlot p = chart.getCategoryPlot();
         p.setRangeGridlinePaint(Color.BLACK);
@@ -281,9 +231,91 @@ public class StatsReportsPanel extends JPanel {
         this.repaint();
         this.revalidate();
         this.add(chartPanel);
-
     }
 
+    /***
+     * Metodo che si occupa di scaricare di aggiornare una TreeMap contenente le date della segnalazione ed il corrispondente
+     * numero di segnalazioni avvenute quel giorno.
+     * La TreeMap si chiama "datesAndCount".
+     *
+     * Il metodo si occuperà di incrementare una occorrenza già presente nella TreeMap o di inizializzarla (quindi con un valore pari a 1).
+     * Il metodo effettuerà questi calcoli solo per le segnalazioni con la priorità specificata dal parametro in ingresso.
+     * @param priority
+     */
+    private void RetrievePriorityReportsData(String priority) {
+        if (chartPanel != null)
+            this.remove(chartPanel);
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("reports");
+        Semaphore semaphore = new Semaphore(0);
+        datesAndCount = new TreeMap<>();
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    if (dataSnapshot1.child("priority").getValue().toString().equals(priority)) {
+                        final String date = dataSnapshot1.child("date").getValue().toString();
+
+                        if (datesAndCount.containsKey(date)) {
+                            int val = datesAndCount.get(date);
+                            ++val;
+                            datesAndCount.put(date, val);
+                        } else {
+                            datesAndCount.put(date, 1);
+                        }
+                    }
+                }
+                semaphore.release();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        for (Map.Entry<String, Integer> entry : datesAndCount.entrySet()) {
+            dataset.setValue(entry.getValue(), "Affluenza segnalazioni", entry.getKey());
+        }
+
+        String title = "";
+        switch (priority) {
+            case "0":
+                title = "Statistiche segnalazioni con bassa priorità";
+                break;
+            case "1":
+                title = "Statistiche segnalazioni con media priorità";
+                break;
+            case "2":
+                title = "Statistiche segnalazioni con alta priorità";
+                break;
+        }
+
+        JFreeChart chart = ChartFactory.createLineChart(title, "Giorni", "Numero di segnalazioni", dataset);
+
+        CategoryPlot p = chart.getCategoryPlot();
+        p.setRangeGridlinePaint(Color.BLUE);
+
+        chartPanel = new ChartPanel(chart);
+        chartConfig();
+
+        this.repaint();
+        this.revalidate();
+        this.add(chartPanel);
+    }
+
+    /***
+     * Questo metodo simula delle variazioni sulle perdite o guadagni della azienda che si occuperò delle segnalazioni.
+     */
     private void retrieveBudgetDataSimulation() {
         if (chartPanel != null)
             this.remove(chartPanel);
@@ -293,7 +325,7 @@ public class StatsReportsPanel extends JPanel {
         dataset.setValue(-50, "Variazione del budget", "11/10");
         dataset.setValue(200, "Variazione del budget", "12/10");
         dataset.setValue(500, "Variazione del budget", "13/10");
-        dataset.setValue(100, "Variazione del budget", "14/10");
+        dataset.setValue(-100, "Variazione del budget", "14/10");
 
         JFreeChart chart = ChartFactory.createLineChart("Transazioni", "Giorni", "Conto (€)", dataset);
 
@@ -309,6 +341,9 @@ public class StatsReportsPanel extends JPanel {
         this.add(chartPanel);
     }
 
+    /***
+     * Metodo utilitario, si occupa di impostare le configurazioni del grafo.
+     */
     private void chartConfig() {
         chartPanel.setSize(500, 500);
         chartPanel.setMaximumSize(new Dimension(500, 500));

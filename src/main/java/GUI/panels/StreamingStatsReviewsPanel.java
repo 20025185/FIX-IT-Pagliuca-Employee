@@ -65,7 +65,6 @@ public class StreamingStatsReviewsPanel extends JPanel {
             plot.getRenderer().setSeriesPaint(1, Color.red);
             plot.getRenderer().setSeriesPaint(2, Color.yellow);
             plot.getRenderer().setSeriesPaint(3, Color.green);
-            //plot.setRangeGridlinePaint(Color.WHITE);
             chartPanel = new ChartPanel(chart);
 
             this.removeAll();
@@ -80,6 +79,11 @@ public class StreamingStatsReviewsPanel extends JPanel {
         this.setBackground(Color.WHITE);
     }
 
+
+    /***
+     *
+     * @param hm
+     */
     private void parseValueAndKeys(HashMap<String, String> hm) {
         if (hm.get("naturale") != null) {
             naturalVal = Integer.parseInt(hm.get("naturale"));
@@ -98,6 +102,10 @@ public class StreamingStatsReviewsPanel extends JPanel {
         }
     }
 
+    /***
+     * Metodo ausiliari che setta le impostazioni per il DefaultCategoryDataset "dataset" (ovvero l'insieme dei dati che verrà rappresentato)
+     * e per il pannello contenente il grafo "chartPanel".
+     */
     private void initializeChartBar() {
         dataset.setValue(0, "", "Problematica di origine naturale");
         dataset.setValue(0, "", "Problematica stradale");

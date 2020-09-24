@@ -13,42 +13,68 @@ import java.awt.event.KeyListener;
 import java.util.concurrent.Semaphore;
 
 public class ChatBidirectional extends JFrame {
-    //  Elements
+    //  JPanel della chat
     private final JPanel chatPanel = new JPanel();
+
+    //  JTextPane, contiene il testo dove viene letta la chat.
     private final JTextPane chatArea = new JTextPane();
+
+    //  JTextField dove viene immesso il messaggio da spedire al destinatario.
     private final JTextField textToSend = new JTextField();
+
+    //  Bottone per inviare il messaggio composto nella JTextField
     private final JButton sendButton = new JButton("Invia");
+
+    //  Strumenti che permettono di effettuare lo scrolling dei messaggi quando si supera una certa soglia.
     private final JScrollPane scrollPane = new JScrollPane();
     private JScrollBar verticalScrollBar = new JScrollBar();
 
-    //  Message Components
-    private String fullname;
-    private String surname;
-    private final Report report;
-    private final Employee employee;
-    private StringBuilder chatString = new StringBuilder();
+    //  Componenti del messaggio
+    private String fullname;    //  Nome
+    private String surname;     //  Cognome
+    private StringBuilder chatString = new StringBuilder(); //  Serve per prelevare i messaggi letti dal DataBase
+
+    //  Variabile contenente gli indici del messaggio
     private int msgIndex = 0;
 
-    //  Firebase
+    //  Singolo report
+    private final Report report;
+
+    //  Impiegato, verrà utilizzato per comporre il messaggio
+    private final Employee employee;
+
+    //  Istanza di FirebaseDatabase
     private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+
+    //  Riferimento al nodo "users" nel RTD.
     private DatabaseReference usersReference = firebaseDatabase.getReference("users");
+
+    //  Riferimento al nodo "reports" nel RTD.
     private DatabaseReference chatReference = firebaseDatabase.getReference("reports");
 
-    //  Utils
-    private Semaphore semaphore1, semaphore2;
+    //  Semafori utili per gestire i metodi asincroni.
+    private Semaphore semaphore1, chatSemaphore;
 
+    /***
+     * Costruttore, preleva le informazioni relative all'utente con il metodo retrieveUserData(), successivamente preleva
+     * le informazione per la chat con il metodo retrieveChatData() ed in fine inizializza il frame con la funzione initializeFrame().
+     * E si mette la JTextField per la composizione del messaggio in ascolto per la pressione del tasto invio, questo per mettere l'invio del messaggio
+     * anche senza il click del bottone invia.
+     *
+     * @param _report
+     * @param _employee
+     */
     public ChatBidirectional(Report _report, Employee _employee) {
         this.report = _report;
         this.employee = _employee;
 
-        retrieveUserData();
+        retrieveUserFullnameAndSurname();
         retrieveChatData();
         initializeFrame();
 
         textToSend.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
-
             }
 
             @Override
@@ -61,18 +87,21 @@ public class ChatBidirectional extends JFrame {
 
             @Override
             public void keyReleased(KeyEvent e) {
-
             }
         });
 
         sendButton.addActionListener(e -> sendingText());
     }
 
-
+    /***
+     * Funzione che effettua l'invio del messaggio sul Real Time Database, questo solo nel caso in cui sia presente del testo
+     * nella JTextField e che il semaforo relativo alla chat abbia finito, quindi che i dati testuali da leggere siano
+     * stati effettivamente caricati nella chatArea.
+     */
     private void sendingText() {
         if (!textToSend.getText().isEmpty()) {
             try {
-                semaphore2.acquire();
+                chatSemaphore.acquire();
             } catch (InterruptedException interruptedException) {
                 interruptedException.printStackTrace();
             }
@@ -90,8 +119,12 @@ public class ChatBidirectional extends JFrame {
         }
     }
 
+    /***
+     * Metodo ausiliario che preleva tutti i messaggi della conversione (nel caso fossero avvenuti in qualche conversazione precedente) e li
+     * carica nell'oggetto chatArea.
+     */
     private void retrieveChatData() {
-        semaphore2 = new Semaphore(1);
+        chatSemaphore = new Semaphore(1);
         chatReference = chatReference.child(report.getId()).child("discussion");
 
         chatReference.addValueEventListener(new ValueEventListener() {
@@ -118,7 +151,7 @@ public class ChatBidirectional extends JFrame {
                 verticalScrollBar = scrollPane.getVerticalScrollBar();
                 verticalScrollBar.setValue(verticalScrollBar.getMaximum());
 
-                semaphore2.release();
+                chatSemaphore.release();
             }
 
             @Override
@@ -129,7 +162,10 @@ public class ChatBidirectional extends JFrame {
 
     }
 
-    void retrieveUserData() {
+    /***
+     * Metodo ausiliario che preleva il nome e cognome dell'utente con cui si comunicherà.
+     */
+    void retrieveUserFullnameAndSurname() {
         semaphore1 = new Semaphore(0);
         usersReference = usersReference.child(report.getUid());
 
@@ -143,16 +179,19 @@ public class ChatBidirectional extends JFrame {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 
     }
 
+    /***
+     * Metodo ausiliario che inizializza il frame dopo che si è atteso il termine delle funzioni ausiliarie per il prelevamento
+     * dei dati utente e della chat.
+     */
     void initializeFrame() {
         try {
             semaphore1.acquire();
-            semaphore2.acquire();
+            chatSemaphore.acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -167,6 +206,10 @@ public class ChatBidirectional extends JFrame {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
+    /***
+     * Funzione ausiliaria che effettua il caricamento degli oggetti necessari (cone le opportune configurazioni) per
+     * il funzionamento della chat sul pannello "chatPanel".
+     */
     private void loadElementsOnPanel() {
         chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
 
@@ -200,6 +243,10 @@ public class ChatBidirectional extends JFrame {
         getContentPane().add(chatPanel);
     }
 
+    /***
+     * Metodo che restituisce la stringa contenente l'ID relativo alla segnalazione per la quale è stata instanziata una chat.
+     * @return
+     */
     public String getReportID() {
         return report.getId();
     }
