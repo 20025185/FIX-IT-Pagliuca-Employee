@@ -1,9 +1,0 @@
-<map id="GUI.panels.StreamingStatsReviewsPanel.loadStatsRecensioniStream" name="GUI.panels.StreamingStatsReviewsPanel.loadStatsRecensioniStream">
-<area shape="rect" id="node1" title=" " alt="" coords="5,115,231,171"/>
-<area shape="rect" id="node2" href="$classkafka_1_1streams_1_1_fix_it_stream.html#a29298c8e9565ee9dc344c379e0672ee2" title=" " alt="" coords="279,5,504,32"/>
-<area shape="rect" id="node3" href="$classkafka_1_1members_1_1_consumer.html#a8a1d6e3b435af7e99b54063feb90a53d" title=" " alt="" coords="293,57,489,98"/>
-<area shape="rect" id="node4" href="$class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html#a7068ca0267c02743789e08a83f2e8a81" title=" " alt="" coords="289,122,493,163"/>
-<area shape="rect" id="node5" href="$class_g_u_i_1_1panels_1_1_streaming_stats_reviews_panel.html#a6a476db8091a35783a94ea2fffb05c39" title=" " alt="" coords="279,187,503,229"/>
-<area shape="rect" id="node6" href="$classkafka_1_1members_1_1_consumer.html#a3f7055ba50e7a648d819f8c24f5ea9c4" title=" " alt="" coords="293,253,489,280"/>
-<area shape="rect" id="node7" href="$classkafka_1_1members_1_1_consumer_1_1_consumer_runnable.html#a0c3e5df5a10cf9d74c75816445b67ae8" title=" " alt="" coords="552,246,789,287"/>
-</map>
