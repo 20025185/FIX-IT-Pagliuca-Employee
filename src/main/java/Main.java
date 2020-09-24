@@ -6,12 +6,19 @@ import com.google.firebase.FirebaseOptions;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+
+
 public class Main {
 
     public static void main(String[] args) throws IOException {
         new LoginWindow();
         initializeFirebase();
     }
+
+    /***
+     *
+     * @throws IOException
+     */
 
     public static void initializeFirebase() throws IOException {
         FileInputStream serviceAccount = new FileInputStream("pagliu-db-firebase-adminsdk-ml5ap-f0eb21cf94.json");

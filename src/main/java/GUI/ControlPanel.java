@@ -37,7 +37,7 @@ public class ControlPanel extends JFrame implements KeyListener {
     private int cardShowed;
 
     public ControlPanel(Employee loggedEmployee) throws IOException {
-        ImageIcon favicon = new ImageIcon("src\\icon.png");
+        ImageIcon favicon = new ImageIcon("src\\imgs\\icons\\icon.png");
         this.setIconImage(favicon.getImage());
         requestFocus(true);
         addKeyListener(this);

@@ -10,13 +10,24 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CountDownLatch;
 
+@SuppressWarnings("JavaDoc")
 public class FirebaseAPI {
     private final static String BASE_URL = "https://identitytoolkit.googleapis.com/v1/accounts:";
     private final static String firebaseKey = "AIzaSyAvOgNrXpFdMpNhi7KgyXq0Bav7WejwRk0";
     private final static String OPERATION_AUTH = "signInWithPassword";
-    boolean isEmployee = false;
+    private Employee employee = null;
 
+    /***
+     * Metodo che permette l'autenticazione sul server di Firebase con FirebaseAuthentication, essendo non possibile effettuare l'autenticazione su
+     * questa piattaforma da Desktop (le API sono strettamente confinate per Mobile) ho dovuto utilizzare le REST API.
+     * Facendo una GET con all'interno Username e Password nella richiesta, il server se trova l'account risponde con un JSON contenente email, uid, tokenID,
+     * in caso contrario darà una 400 Bad Request.
+     * @param username
+     * @param password
+     * @return
+     */
     public Employee signInWithPassword(String username, String password) {
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(
@@ -29,7 +40,8 @@ public class FirebaseAPI {
         URL url;
         URLConnection con;
         HttpURLConnection urlRequest;
-        Employee employee = new Employee();
+
+        String email, uid, token;
 
         try {
             url = new URL(BASE_URL + OPERATION_AUTH + "?key=" + firebaseKey);
@@ -48,33 +60,48 @@ public class FirebaseAPI {
 
             JSONObject jsonObject = convertInputStreamToJSONObject((InputStream) urlRequest.getContent());
 
-            employee.setEmail(jsonObject.get("email").toString());
-            employee.setUID(jsonObject.get("localId").toString());
-            employee.setTokenID(jsonObject.get("idToken").toString());
+            email = jsonObject.get("email").toString();
+            uid = jsonObject.get("localId").toString();
+            token = jsonObject.get("idToken").toString();
 
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
 
-        //  Chiamo la funzione per arrichire i dati dell'impiegato nel caso fosse un impiegato, nel caso contrario restituisco null.
-        return retrieveOtherInfo(employee);
+        return retrieveOtherInfo(email, uid, token);
     }
 
-    private Employee retrieveOtherInfo(Employee employee) {
+    /***
+     *  Le stringhe contenenti la risposta Json smistata vengono passate a questo metodo, il quale si occupa di cercare all'interno del
+     *  Real Time Database la presenza dell'UID nella tabella degli impiegati "employee".
+     *  Se la presenza ne è verificata, in tal caso si creerà un oggetto Employee contenente i dati precedentemente ottenuti dal Json e
+     *  i dati ottenuti dal RTB di Firebase.
+     *  In caso contrario si restituirà un valore nullo.
+     * @param email
+     * @param uid
+     * @param token
+     * @return
+     */
+    private Employee retrieveOtherInfo(String email, String uid, String token) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("employee");
+        CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        databaseReference.child(employee.getUID()).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(uid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(employee.getUID()).getValue() != null) {
+                if (dataSnapshot.getValue() != null) {
+                    employee = new Employee();
+                    employee.setEmail(email);
+                    employee.setUID(uid);
+                    employee.setTokenID(token);
                     employee.setFiscalCode(dataSnapshot.child("fiscalCode").getValue().toString());
                     employee.setFullname(dataSnapshot.child("fullname").getValue().toString());
                     employee.setSurname(dataSnapshot.child("surname").getValue().toString());
                     employee.setImageURL(dataSnapshot.child("imageURL").getValue().toString());
                     employee.setBirthday(dataSnapshot.child("birthday").getValue().toString());
-                    isEmployee = true;
                 }
+                countDownLatch.countDown();
             }
 
             @Override
@@ -83,14 +110,22 @@ public class FirebaseAPI {
             }
         });
 
-        //  Controllo se è un impiegato, nella LoginWindow nella riga 107, si mostrerà un dialog in caso contrario.
-        if (isEmployee) {
-            return employee;
-        } else {
-            return null;
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        return employee;
     }
 
+    /***
+     * Funzione ausiliaria, serve per convertire i dati che si ricevono sullo stream in ingresso in un oggetto Json.
+     * @param inputStream
+     * @return
+     * @throws JSONException
+     * @throws IOException
+     */
     private static JSONObject convertInputStreamToJSONObject(InputStream inputStream)
             throws JSONException, IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));

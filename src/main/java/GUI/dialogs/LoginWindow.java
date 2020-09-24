@@ -31,7 +31,7 @@ public class LoginWindow extends JFrame implements ActionListener {
 
     private void initialize() {
         this.setTitle("LOGIN");
-        this.setIconImage(new ImageIcon("src\\lemon-icon.png").getImage());
+        this.setIconImage(new ImageIcon("src\\imgs\\icons\\lemon-icon.png").getImage());
         this.setSize(300, 180);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
