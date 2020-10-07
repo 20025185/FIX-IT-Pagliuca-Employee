@@ -12,8 +12,6 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 @SuppressWarnings("JavaDoc")
@@ -87,13 +85,13 @@ public class FixItStream {
                 .groupByKey()
                 .count(Materialized.as("count-store"))
                 .toStream()
-                .mapValues((key, value) -> Long.toString(value))
+                .mapValues((key, value) ->Long.toString(value))
                 .to("count-fav-issues", Produced.with(Serdes.String(), Serdes.String()));
 
         final Topology topology = builder.build();
         System.out.println(topology.describe());
 
-        KafkaStreams streams = new KafkaStreams(builder.build(), config);
+        KafkaStreams streams = new KafkaStreams(topology, config);
 
         streams.start();
         streams.localThreadsMetadata().forEach(data -> System.out.println());
@@ -124,54 +122,19 @@ public class FixItStream {
     }
 
     /***
-     *  Funzione di callback che restituisce il valore della recensione nella segnalazione rappresentata da un oggetto Json.
-     * @param valueJsn
-     * @return
-     */
-    private String getRating(String valueJsn) {
-        final int RATING_JSON_INDEX = 6;
-
-        List<String> separatedValues;
-
-        String valueStr = valueJsn.substring(1, valueJsn.length() - 1);
-
-        separatedValues = Arrays.asList(valueStr.split(","));
-
-        int end = separatedValues.get(RATING_JSON_INDEX).lastIndexOf("\"");
-        int start = separatedValues.get(RATING_JSON_INDEX)
-                .substring(0, separatedValues.get(RATING_JSON_INDEX).length() - 1)
-                .lastIndexOf("\"");
-
-        String finalStr = separatedValues.get(RATING_JSON_INDEX).substring(start + 1, end);
-
-        double val = Double.parseDouble(finalStr);
-
-        return Double.toString(val);
-    }
-
-    /***
      * Metodo Callback utilizzato per restituire un tag rappresentate il tipo della segnalazione, questo perchè restituire
      * esattamente la stringa del tipo potrebbe risultare in svariate complicanze in fase di matching (es. se si perde un carattere).
      * @param valueJsn
      * @return
      */
     private String retrieveIssueType(String valueJsn) {
-        final int RATING_JSON_INDEX = 10;
-
-        List<String> separatedValues;
-
         String valueStr = valueJsn.substring(1, valueJsn.length() - 1);
+        int start = valueStr.indexOf("type");
+        String typeStr = valueStr.substring(start + 7, valueStr.length() - 1);
+        int end = typeStr.indexOf(",");
+        typeStr = typeStr.substring(0, end - 1);
 
-        separatedValues = Arrays.asList(valueStr.split(","));
-
-        int end = separatedValues.get(RATING_JSON_INDEX).lastIndexOf("\"");
-        int start = separatedValues.get(RATING_JSON_INDEX)
-                .substring(0, separatedValues.get(RATING_JSON_INDEX).length() - 1)
-                .lastIndexOf("\"");
-
-        String finalStr = separatedValues.get(RATING_JSON_INDEX).substring(start + 1, end);
-
-        switch (finalStr) {
+        switch (typeStr) {
             case "Problematica Stradale":
                 return "stradale";
             case "Problematica di origine naturale":
@@ -180,8 +143,25 @@ public class FixItStream {
                 return "sospette";
             case "Altro":
                 return "altro";
+            default:
+                return "undefined";
         }
-        return "undefined";
+    }
+
+    /***
+     *  Funzione di callback che restituisce il valore della recensione nella segnalazione rappresentata da un oggetto Json.
+     * @param valueJsn
+     * @return
+     */
+    private String getRating(String valueJsn) {
+        String valueStr = valueJsn.substring(1, valueJsn.length() - 1);
+        int start = valueStr.indexOf("rating");
+        String typeStr = valueStr.substring(start + 9, valueStr.length() - 1);
+        int end = typeStr.indexOf("social") - 3;
+        typeStr = typeStr.substring(0, end);
+        System.out.println(typeStr);
+
+        return typeStr;
     }
 
     /***
